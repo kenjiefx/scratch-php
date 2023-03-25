@@ -1,0 +1,8 @@
+/vendor/
+/node_modules/
+/theme/
+/dist/*
+!/dist/README.md
+/src/App/Pages/bin/*
+!/src/App/Pages/bin/README.md
+/scratch.config.json
