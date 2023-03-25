@@ -56,6 +56,7 @@ class BuildController
         }
 
         $this->pageRegistry->clearBin();
+        $this->postBuildServices();
     }
 
     private function buildPageContents(
@@ -151,6 +152,7 @@ class BuildController
             $path = $dirToClear.'/'.$file;
             if (is_dir($path)) {
                 $this->clearExportDir($path);
+                rmdir($path);
             } else {
                 unlink($path);
             }
@@ -161,6 +163,14 @@ class BuildController
         PageModel $pageModel
     ){
         $GLOBALS['__page_model'] = $pageModel;
+    }
+
+    public function postBuildServices(){
+        foreach (AppSettings::extensions()->getExtensions() as $extension) {
+            if (method_exists($extension,'onBuildComplete')) {
+                $extension->onBuildComplete();
+            }
+        }
     }
     
 }
