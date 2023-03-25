@@ -1,0 +1,26 @@
+{
+    "name": "kenjiefx/scratch-php-dev",
+    "description": "A static site generator built using PHP",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Kenjiefx\\ScratchPHP\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kenjiefx",
+            "email": "terradoflex@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "tedivm/jshrink": "dev-master",
+        "slim/slim": "4.x-dev",
+        "guzzlehttp/psr7": "2.4.x-dev",
+        "psr/container": "2.0.x-dev",
+        "league/container": "4.x-dev",
+        "symfony/console": "6.3.x-dev"
+    }
+}
