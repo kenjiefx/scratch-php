@@ -74,7 +74,8 @@ function component(
  * @param string $snippetName = The file name of the snippet
  */
 function snippet(
-    string $snippetName
+    string $snippetName,
+    array $data = []
 ){
     $themeController = ContainerFactory::create()->get(ThemeController::class);
     $snippetPath = $themeController->getSnippetPath($snippetName);
@@ -83,5 +84,18 @@ function snippet(
         $error .= 'when it is not found in this theme in this path: '.$snippetPath;
         throw new \Exception($error);
     }
+    $snippet = $data;
     include $snippetPath;
+}
+
+/**
+ * Allows access to the page data declared in page.json
+ * @param string field
+ */
+function page_data(
+    string $field
+){
+    $pageModel = $GLOBALS['__page_model'];
+    $data = $pageModel->getPageData();
+    return (isset($data[$field])) ? $data[$field] : null;
 }
