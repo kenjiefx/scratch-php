@@ -17,7 +17,8 @@ class PageFactory
             name: $fileName,
             templateName: $pageJson['templateName'],
             dirPath: $dirPath,
-            title: $pageJson['title'] ?? $fileName
+            title: $pageJson['title'] ?? $fileName,
+            data: $pageJson['data'] 
         );
         return $pageModel;
     }
@@ -53,7 +54,8 @@ class PageFactory
         }
         return [
             'templateName' => $data['template'],
-            'title' => $data['title'] ?? null
+            'title' => $data['title'] ?? null,
+            'data' => $data['data'] ?? []
         ];
     }
 

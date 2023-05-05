@@ -11,7 +11,8 @@ class PageModel
         private string $name,
         private string $templateName,
         private string $dirPath,
-        private string $title
+        private string $title,
+        private array $data
     ){
 
     }
@@ -48,6 +49,10 @@ class PageModel
 
     public function getPageJS(){
         return file_get_contents($this->getBinPath('js'));
+    }
+
+    public function getPageData(){
+        return $this->data;
     }
 
     public function getDirPath(){
