@@ -6,7 +6,7 @@ use Kenjiefx\ScratchPHP\App\Commands\Build;
 use Kenjiefx\ScratchPHP\App\Commands\Create\Component;
 use Kenjiefx\ScratchPHP\App\Commands\Create\Template;
 use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
-use Kenjiefx\ScratchPHP\App\Modules\ModuleInterface;
+use Kenjiefx\ScratchPHP\App\Interfaces\ModuleInterface;
 use Kenjiefx\ScratchPHP\Container;
 use Kenjiefx\ScratchPHP\App\Commands\Create\Theme;
 use Symfony\Component\Console\Application;

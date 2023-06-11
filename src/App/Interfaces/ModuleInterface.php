@@ -1,6 +1,6 @@
 <?php 
 
-namespace Kenjiefx\ScratchPHP\App\Modules;
+namespace Kenjiefx\ScratchPHP\App\Interfaces;
 
 interface ModuleInterface
 {
