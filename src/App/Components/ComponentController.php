@@ -26,7 +26,7 @@ class ComponentController
     }
 
 
-    public function create_component(string $component_name){
+    public function create_component(string $component_name, array $options){
 
         $this->set_component_name($component_name);
         $this->ThemeController->mount_theme(AppSettings::get_theme_name_from_config());
@@ -52,12 +52,14 @@ class ComponentController
         );
 
         # Extensions
-        foreach (AppSettings::extensions()->get_extensions() as $extension) {
-            $component_html = $extension->onCreateComponentContent($component_model,$component_html);
-            $component_css  = $extension->onCreateComponentCSS($component_model,$component_css);
-            $component_js   = $extension->onCreateComponentJS($component_model,$component_js);
+        if ($options['apply_extensions']) {
+            foreach (AppSettings::extensions()->get_extensions() as $extension) {
+                $component_html = $extension->onCreateComponentContent($component_model,$component_html);
+                $component_css  = $extension->onCreateComponentCSS($component_model,$component_css);
+                $component_js   = $extension->onCreateComponentJS($component_model,$component_js);
+            }
         }
-
+        
         mkdir($component_dir_path);
 
         file_put_contents($component_html_path,$component_html);

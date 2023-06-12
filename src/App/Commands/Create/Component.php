@@ -9,6 +9,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'create:component')]
@@ -23,14 +24,17 @@ class Component extends Command
     {
         $component_name = $input->getArgument('component_name');
         $ComponentController = ContainerFactory::create()->get(ComponentController::class);
-        $ComponentController->create_component($component_name);
+        $ComponentController->create_component($component_name,[
+            'apply_extensions' => !$input->getOption('clean')
+        ]);
         return Command::SUCCESS;
     }
 
     protected function configure(): void
     {
         $this->setHelp('This command allows you to create a component in your theme.')
-             ->addArgument('component_name', InputArgument::REQUIRED, 'What is the name of this component (no spaces please)?');
+             ->addArgument('component_name', InputArgument::REQUIRED, 'What is the name of this component (no spaces please)?')
+             ->addOption('clean',null,InputOption::VALUE_NONE,'Create component without modification from your extensions?');
     }
 
 
