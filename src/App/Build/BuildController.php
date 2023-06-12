@@ -8,39 +8,52 @@ use Kenjiefx\ScratchPHP\App\Templates\TemplateRegistry;
 use Kenjiefx\ScratchPHP\App\Configuration\AppSettings;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
+/**
+ * The BuildController class encapsulates various functionalities and methods necessary for the build process. 
+ * It coordinates the retrieval of data from different sources, and processes them to generate static HTML pages.  
+ */
 class BuildController
 {
 
-    private string $exportDirPath = '';
+    /**
+     * The directory where the static HTML, Javascript and CSS are exported into. 
+     * To know where or how you can define the export directory, please see 
+     * `AppSettings::get_export_dir_path_from_config()` method.
+     */
+    private string $export_dir_path = '';
 
     public function __construct(
-        private ThemeController $themeController,
-        private PageRegistry $pageRegistry,
-        private TemplateRegistry $templateRegistry, 
+        private ThemeController $ThemeController,
+        private PageRegistry $PageRegistry,
+        private TemplateRegistry $TemplateRegistry, 
         private CSSController $CSSController, 
         private JSController $JSController
     ){
         AppSettings::load();
-        $this->exportDirPath = ROOT.AppSettings::getExportDirPath();
+        $this->export_dir_path = AppSettings::get_export_dir_path_from_config();
     }
 
-    public function buildSite(){
-        $this->themeController->useTheme(AppSettings::getThemeName());
-        $this->pageRegistry->discover();
+    /**
+     * Handles the procedural side of the build process. This method orchestrates
+     * different stages of the building static contents.
+     */
+    public function build(){
+        $this->ThemeController->mount_theme(AppSettings::get_theme_name_from_config());
+        $this->PageRegistry->discover();
         $this->importBuildFns();
 
         /**
          * We collect information as to what components and snippets 
          * each of the page templates is using
          */
-        foreach ($this->pageRegistry->getPages() as $pageModel) {
+        foreach ($this->PageRegistry->getPages() as $pageModel) {
             $this->importGlobalVals($pageModel);
             $this->buildPageContents($pageModel);
             $this->buildPageAssets($pageModel);
             $this->refinePage($pageModel);
         }
 
-        $this->clearExportDir($this->exportDirPath);
+        $this->clearExportDir($this->export_dir_path);
 
         /**
          * We export the pages into the provided export directory.
@@ -50,12 +63,12 @@ class BuildController
          * errors along the way, killing the build process without really 
          * exporting any changes to the export directory. 
          */
-        foreach ($this->pageRegistry->getPages() as $pageModel) {
+        foreach ($this->PageRegistry->getPages() as $pageModel) {
             $this->exportPageContents($pageModel);
             $this->exportPageAssets($pageModel);
         }
 
-        $this->pageRegistry->clearBin();
+        $this->PageRegistry->clearBin();
         $this->postBuildServices();
     }
 
@@ -63,10 +76,10 @@ class BuildController
         PageModel $pageModel
     ){
         $templateName = $pageModel->getTemplateName();
-        $templateModel = $this->templateRegistry->register($templateName);
+        $templateModel = $this->TemplateRegistry->register($templateName);
 
         ob_start();
-        include $this->themeController->getIndexPath();
+        include $this->ThemeController->getIndexPath();
         $pageModel->setPageHTML(ob_get_contents());
         ob_end_clean();
 
@@ -84,7 +97,7 @@ class BuildController
 
         /** Component CSS and Javascript */
         $templateName = $pageModel->getTemplateName();
-        $templateModel = $this->templateRegistry->getTemplateModel($templateName);
+        $templateModel = $this->TemplateRegistry->getTemplateModel($templateName);
         $usedComponents = $templateModel->listUsedComponents();
         $pageCss .= $this->CSSController->buildComponentCSS($usedComponents);
         $pageJS .= $this->JSController->buildComponentJS($usedComponents);
@@ -97,7 +110,7 @@ class BuildController
         PageModel $pageModel
     ){
         $templateName = $pageModel->getTemplateName();
-        $templateModel = $this->templateRegistry->getTemplateModel($templateName);
+        $templateModel = $this->TemplateRegistry->getTemplateModel($templateName);
 
         # Extensions
         foreach (AppSettings::extensions()->getExtensions() as $extension) {
@@ -116,7 +129,7 @@ class BuildController
         /** 
          * Retrieve and create export directory, if not existing
          */
-        $pageDir = $this->exportDirPath.'/'.$pageModel->getDirPath().'/';
+        $pageDir = $this->export_dir_path.'/'.$pageModel->getDirPath().'/';
         if (!is_dir($pageDir)) mkdir($pageDir);
 
         $staticExtension = (AppSettings::build()->exportPageWithoutHTMLExtension() === true) ? '' : '.html';
@@ -128,7 +141,7 @@ class BuildController
         PageModel $pageModel
     ){
         $pageDirPath = ($pageModel->getDirPath()==='') ? '' : '/'.$pageModel->getDirPath(); 
-        $assetsDir = $this->exportDirPath.'/assets'.$pageDirPath.'/';
+        $assetsDir = $this->export_dir_path.'/assets'.$pageDirPath.'/';
         if (!is_dir($assetsDir)) mkdir($assetsDir);
 
         $assetsFileName = (AppSettings::build()->useRandomAssetsFileNames()===true) 

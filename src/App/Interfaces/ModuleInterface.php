@@ -7,10 +7,10 @@ interface ModuleInterface
     /**
      * Import module dependencies
      */
-    public function importDependencies();
+    public function prepare_dependencies();
 
     /**
      * Runs module
      */
-    public function runCommands();
+    public function run_commands();
 }

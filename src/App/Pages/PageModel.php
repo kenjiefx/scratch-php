@@ -6,13 +6,13 @@ class PageModel
 {
 
     public function __construct(
-        private string $id,
-        private string $binId,
-        private string $name,
-        private string $templateName,
-        private string $dirPath,
-        private string $title,
-        private array $data
+        private string $page_id,
+        private string $bin_reference_id,
+        private string $page_name,
+        private string $template_name,
+        private string $dir_location,
+        private string $page_title,
+        private array $page_data
     ){
 
     }

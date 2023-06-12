@@ -2,6 +2,7 @@
 
 namespace Kenjiefx\ScratchPHP\App\Configuration;
 use Kenjiefx\ScratchPHP\App\Exceptions\ConfigurationException;
+use Kenjiefx\ScratchPHP\App\Exceptions\MustImplementExtensionInterfaceException;
 use Kenjiefx\ScratchPHP\App\Extensions\ExtensionsRegistry;
 use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
 use Kenjiefx\ScratchPHP\App\Interfaces\ExtensionsInterface;
@@ -12,25 +13,25 @@ class AppSettings
      * Tells whether the configuration has been loaded 
      * already or not
      */
-    private static bool $hasLoaded = false;
+    private static bool $is_initialized = false;
 
     /**
      * The name of the strawberry configuration file 
      */
-    private static string $fileName = 'scratch.config.json';
+    private static string $file_name = 'scratch.config.json';
 
     /**
      * Contains a list of the configurable settings within
      * the framework and their values
      */
-    private static array $appConfiguration = [];
+    private static array $app_configuration = [];
 
     /**
      * Build configuration manager
      */
-    private static BuildConfiguration $buildConfiguration; 
+    private static BuildConfiguration $BuildConfiguration; 
 
-    private static ExtensionsRegistry $extensionsRegistry;
+    private static ExtensionsRegistry $ExtensionsRegistry;
 
     /**
      * Loads strawberry configuration file
@@ -38,78 +39,83 @@ class AppSettings
     public static function load()
     {
 
-        $error = 'Strawberry configuration not found. Please make sure that the file ';
-        $error .= 'strawberry.config.json exists in your root directory and is valid. ';
-        $error .= 'To generate the configuration file, use init conmmand.';
+        if (!static::$is_initialized) {
 
-        if (!static::$hasLoaded) {
-            $path = Self::getConfigFilePath();
-            if (!file_exists($path)) {
-                throw new ConfigurationException($error);
-            }
-            $config = json_decode(file_get_contents($path),TRUE);
-            static::$appConfiguration = $config;
-            if (isset($config['build'])) {
-                static::$buildConfiguration = new BuildConfiguration($config['build']);
+            # Making sure that the config json exists in the project directory
+            $config_path = Self::get_path_to_config();
+            if (!file_exists($config_path)) throw new ConfigurationException();
+
+            # Next, we store the configuration data
+            static::$app_configuration = Self::unpack_config_json(file_get_contents($config_path));
+            
+            if (isset(static::$app_configuration['build'])) {
+                static::$BuildConfiguration = new BuildConfiguration(static::$app_configuration['build']);
             }
 
-            static::$extensionsRegistry = new ExtensionsRegistry();
-            if (isset($config['extensions'])) {
-                foreach ($config['extensions'] as $extensionNamespace => $settings) {
-                    $objectReflection = new \ReflectionClass($extensionNamespace);
-                    if (!$objectReflection->implementsInterface(ExtensionsInterface::class)) {
-                        $extError = 'Unsupported Extension! Please make sure that the extension you are using "'.$extensionNamespace.'" ';
-                        $extError .= 'is implementing the Extension Interface "'.ExtensionsInterface::class.'"';
-                        throw new \Exception($extError);
-                    }
-                    $objectExtension = ContainerFactory::create()->get($extensionNamespace);
-                    static::$extensionsRegistry->addExtension($objectExtension);
-                }
+            static::$ExtensionsRegistry = new ExtensionsRegistry();
+            if (isset(static::$app_configuration['extensions'])) {
+                Self::mount_extensions();
             }
 
-            static::$hasLoaded = true;
+            static::$is_initialized = true;
         }
         
+    }
+
+    private static function unpack_config_json(string $config_json):array{
+        return json_decode($config_json,TRUE);
+    }
+
+    private static function mount_extensions(){
+        foreach (static::$app_configuration['extensions'] as $extension_namespace => $extension_settings) {
+            $object_reflection = new \ReflectionClass($extension_namespace);
+
+            if (!$object_reflection->implementsInterface(ExtensionsInterface::class)) {
+                throw new MustImplementExtensionInterfaceException($extension_namespace);
+            }
+            $object_extension = ContainerFactory::create()->get($extension_namespace);
+            static::$ExtensionsRegistry->add_extensions($object_extension);
+        }
     }
 
     /**
      * Returns the path of the strawberry configuration file
      */
-    private static function getConfigFilePath()
+    private static function get_path_to_config()
     {
-        return static::$fileName;
+        return ROOT.'/'.static::$file_name;
     }
 
-    public static function getThemeName()
+    public static function get_theme_name_from_config()
     {
-        return static::$appConfiguration['theme'] ?? 'infinity';
+        return static::$app_configuration['theme'] ?? 'slate';
     }
 
-    public static function getExportDirPath(){
-        return static::$appConfiguration['exportDir'] ?? '/dist';
+    public static function get_export_dir_path_from_config(){
+        return static::$app_configuration['exportDir'] ?? '/dist';
     }
 
     public static function build()
     {
-        return static::$buildConfiguration;
+        return static::$BuildConfiguration;
     }
 
     public static function extensions(){
-        return static::$extensionsRegistry;
+        return static::$ExtensionsRegistry;
     }
 
     public static function create(
-        string $themeName
+        string $theme_name
     ){
         $config = [
-            'theme' => $themeName,
+            'theme' => $theme_name,
             'exportDir' => '/dist',
             'build' => [
                 'useRandomAssetsFileNames' => false
             ],
             'extensions' => []
         ];
-        $path = ROOT.'/'.Self::getConfigFilePath(); 
+        $path = Self::get_path_to_config(); 
         if (!file_exists($path)) {
             file_put_contents($path,json_encode($config,JSON_PRETTY_PRINT));
             return true;
