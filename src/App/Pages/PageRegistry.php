@@ -57,7 +57,7 @@ class PageRegistry
 
     }
 
-    public function clearBin(){
+    public function clear_bin(){
         @array_map('unlink', array_filter((array) glob(__dir__."/bin/*") ) );
         file_put_contents(__dir__.'/bin/README.md','');
     }

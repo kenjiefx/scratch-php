@@ -21,9 +21,9 @@ class Component extends Command
         OutputInterface $output
         ): int
     {
-        $componentName = $input->getArgument('component_name');
-        $componentController = ContainerFactory::create()->get(ComponentController::class);
-        $componentController->createComponent($componentName);
+        $component_name = $input->getArgument('component_name');
+        $ComponentController = ContainerFactory::create()->get(ComponentController::class);
+        $ComponentController->create_component($component_name);
         return Command::SUCCESS;
     }
 

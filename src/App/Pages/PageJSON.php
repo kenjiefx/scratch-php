@@ -33,10 +33,9 @@ class PageJSON
         if (!isset($page_json_data['title'])) throw new MissingPageJsonFieldException('title',$page_json_path);
         $this->page_title = $page_json_data['title'];
 
-        if (!isset($page_json_data['data'])) throw new MissingPageJsonFieldException('data',$page_json_path);
-        $this->page_data = $page_json_data['data'];
+        if (isset($page_json_data['data'])) $this->page_data = $page_json_data['data'];
 
-        $this->derive_metadata_from_path($page_json_data);
+        $this->derive_metadata_from_path($page_json_path);
 
         return $this;
     }
@@ -44,7 +43,7 @@ class PageJSON
     private function derive_metadata_from_path(string $page_json_path){
         $path_tokens        = explode('/',$page_json_path);
         $file_name_pos      = count($path_tokens) - 1;
-        [$this->file_name,] = explode('.',$path_tokens[$file_name_pos])[0];
+        [$this->file_name,] = explode('.',$path_tokens[$file_name_pos]);
         array_shift($path_tokens);
         array_pop($path_tokens);
         $this->relative_path = implode('/',$path_tokens);
@@ -59,7 +58,7 @@ class PageJSON
     }
 
     public function get_page_data(){
-        return $this->page_data;
+        return $this->page_data ?? [];
     }
 
     public function get_file_name(){

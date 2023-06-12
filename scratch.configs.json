@@ -1,8 +1,0 @@
-{
-    "theme": "slate",
-    "exportDir": "\/dist",
-    "build": {
-        "useRandomAssetsFileNames": false
-    },
-    "extensions": []
-}

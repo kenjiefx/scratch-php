@@ -17,64 +17,55 @@ class PageModel
 
     }
 
-    public function getTemplateName(){
-        return $this->templateName;
+    public function get_template_name(){
+        return $this->template_name;
     }
 
-    public function setPageHTML(
-        string $contentHTML
-    ){
-        file_put_contents($this->getBinPath('html'),$contentHTML);
+    public function set_html(string $html_content){
+        file_put_contents($this->generate_bin_path('html'), $html_content);
     }
 
-    public function setPageCSS(
-        string $contentCSS
-    ){
-        file_put_contents($this->getBinPath('css'),$contentCSS);
+    public function set_css(string $css_content){
+        file_put_contents($this->generate_bin_path('css'),$css_content);
     }
 
-    public function setPageJS(
-        string $contentJS
-    ){
-        file_put_contents($this->getBinPath('js'),$contentJS);
+    public function set_javascript(string $javascript_content){
+        file_put_contents($this->generate_bin_path('js'),$javascript_content);
     }
 
-    public function getPageHTML(){
-        return file_get_contents($this->getBinPath('html'));
+    public function get_html(){
+        return file_get_contents($this->generate_bin_path('html'));
     }
 
-    public function getPageCSS(){
-        return file_get_contents($this->getBinPath('css'));
+    public function get_css(){
+        return file_get_contents($this->generate_bin_path('css'));
     }
 
-    public function getPageJS(){
-        return file_get_contents($this->getBinPath('js'));
+    public function get_javascript(){
+        return file_get_contents($this->generate_bin_path('js'));
     }
 
-    public function getPageData(){
-        return $this->data;
+    public function get_data(){
+        return $this->page_data;
     }
 
-    public function getDirPath(){
-        return $this->dirPath;
+    public function get_directory_path(){
+        return $this->dir_location;
     }
 
-    public function getName(){
-        return $this->name;
+    public function get_name(){
+        return $this->page_name;
     }
 
-    public function getId(){
-        return $this->id;
+    public function get_id(){
+        return $this->page_id;
     }
 
-    public function getTitle(){
-        return $this->title;
+    public function get_title(){
+        return $this->page_title;
     }
 
-    public function getBinPath(
-        string $fileType
-    ){
-        return __dir__.'/bin/'.
-            $this->binId.'.'.$fileType;
+    public function generate_bin_path(string $file_type){
+        return __dir__.'/bin/'.$this->bin_reference_id.'.'.$file_type;
     }
 }

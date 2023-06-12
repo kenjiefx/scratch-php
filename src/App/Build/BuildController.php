@@ -30,7 +30,7 @@ class BuildController
         private JSController $JSController
     ){
         AppSettings::load();
-        $this->export_dir_path = AppSettings::get_export_dir_path_from_config();
+        $this->export_dir_path = ROOT.AppSettings::get_export_dir_path_from_config();
     }
 
     /**
@@ -40,20 +40,21 @@ class BuildController
     public function build(){
         $this->ThemeController->mount_theme(AppSettings::get_theme_name_from_config());
         $this->PageRegistry->discover();
-        $this->importBuildFns();
+
+        $this->import_build_helper_functions();
 
         /**
          * We collect information as to what components and snippets 
          * each of the page templates is using
          */
-        foreach ($this->PageRegistry->getPages() as $pageModel) {
-            $this->importGlobalVals($pageModel);
-            $this->buildPageContents($pageModel);
-            $this->buildPageAssets($pageModel);
-            $this->refinePage($pageModel);
+        foreach ($this->PageRegistry->get_registered_pages_as_page_models() as $page_model) {
+            $this->set_globals($page_model);
+            $this->build_page_contents($page_model);
+            $this->build_page_assets($page_model);
+            $this->apply_extensions($page_model);
         }
 
-        $this->clearExportDir($this->export_dir_path);
+        $this->clear_export_dir($this->export_dir_path);
 
         /**
          * We export the pages into the provided export directory.
@@ -63,108 +64,95 @@ class BuildController
          * errors along the way, killing the build process without really 
          * exporting any changes to the export directory. 
          */
-        foreach ($this->PageRegistry->getPages() as $pageModel) {
-            $this->exportPageContents($pageModel);
-            $this->exportPageAssets($pageModel);
+        foreach ($this->PageRegistry->get_registered_pages_as_page_models() as $page_model) {
+            $this->export_page_content($page_model);
+            $this->export_page_assets($page_model);
         }
 
-        $this->PageRegistry->clearBin();
-        $this->postBuildServices();
+        $this->PageRegistry->clear_bin();
+        $this->post_build_services();
     }
 
-    private function buildPageContents(
-        PageModel $pageModel
-    ){
-        $templateName = $pageModel->getTemplateName();
-        $templateModel = $this->TemplateRegistry->register($templateName);
+    private function build_page_contents(PageModel $page_model){
+        $template_name = $page_model->get_template_name();
+        $template_model = $this->TemplateRegistry->register($template_name);
 
         ob_start();
-        include $this->ThemeController->getIndexPath();
-        $pageModel->setPageHTML(ob_get_contents());
+        include $this->ThemeController->get_index_file_path();
+        $page_model->set_html(ob_get_contents());
         ob_end_clean();
 
-        if (!$templateModel->hasbeenFrozen()) {
-            $templateModel->freeze();
-        }
+        if (!$template_model->has_been_frozen()) $template_model->freeze();
     }
 
-    public function buildPageAssets(
-        PageModel $pageModel
-    ){
+    public function build_page_assets(PageModel $page_model){
         /** Global CSS and JavaScript */
-        $pageCss = $this->CSSController->buildGlobalCSS();
-        $pageJS = $this->JSController->buildGlobalJS();
+        $global_page_css = $this->CSSController->collect_global_css();
+        $global_page_js  = $this->JSController->collect_global_js();
 
         /** Component CSS and Javascript */
-        $templateName = $pageModel->getTemplateName();
-        $templateModel = $this->TemplateRegistry->getTemplateModel($templateName);
-        $usedComponents = $templateModel->listUsedComponents();
-        $pageCss .= $this->CSSController->buildComponentCSS($usedComponents);
-        $pageJS .= $this->JSController->buildComponentJS($usedComponents);
+        $template_name = $page_model->get_template_name();
+        $TemplateModel = $this->TemplateRegistry->get_template_model($template_name);
+        $global_page_css .= $this->CSSController->collect_component_css($TemplateModel);
+        $global_page_js .= $this->JSController->collect_component_js($TemplateModel);
 
-        $pageModel->setPageCSS($pageCss);
-        $pageModel->setPageJS($pageJS);
+        $page_model->set_css($global_page_css);
+        $page_model->set_javascript($global_page_js);
     }
 
-    private function refinePage(
-        PageModel $pageModel
-    ){
-        $templateName = $pageModel->getTemplateName();
-        $templateModel = $this->TemplateRegistry->getTemplateModel($templateName);
+    private function apply_extensions(PageModel $page_model){
+        $template_name = $page_model->get_template_name();
+        $template_model = $this->TemplateRegistry->get_template_model($template_name);
 
         # Extensions
-        foreach (AppSettings::extensions()->getExtensions() as $extension) {
-            $processedHTML = $extension->mutatePageHTML($pageModel->getPageHTML());
-            $processedCSS = $extension->mutatePageCSS($pageModel->getPageCSS());
-            $processedJS = $extension->mutatePageJS($pageModel->getPageJS());
-            $pageModel->setPageHTML($processedHTML);
-            $pageModel->setPageCSS($processedCSS);
-            $pageModel->setPageJS($processedJS);
+        foreach (AppSettings::extensions()->get_extensions() as $extension) {
+            $html_content = $extension->mutatePageHTML($page_model->get_html());
+            $css_content  = $extension->mutatePageCSS($page_model->get_css());
+            $js_content   = $extension->mutatePageJS($page_model->get_javascript());
+            $page_model->set_html($html_content);
+            $page_model->set_css($css_content);
+            $page_model->set_javascript($js_content);
         }
     }
 
-    private function exportPageContents(
-        PageModel $pageModel
-    ){
-        /** 
-         * Retrieve and create export directory, if not existing
-         */
-        $pageDir = $this->export_dir_path.'/'.$pageModel->getDirPath().'/';
-        if (!is_dir($pageDir)) mkdir($pageDir);
+    private function export_page_content(PageModel $page_model){
 
-        $staticExtension = (AppSettings::build()->exportPageWithoutHTMLExtension() === true) ? '' : '.html';
-        $exportPath = $pageDir.$pageModel->getName().$staticExtension;
-        file_put_contents($exportPath,$pageModel->getPageHTML());
+        # Retrieve and create export directory, if not existing
+        $page_directory = $this->export_dir_path.'/'.$page_model->get_directory_path().'/';
+        if (!is_dir($page_directory)) mkdir($page_directory);
+
+        $static_extension = (AppSettings::build()->exportPageWithoutHTMLExtension() === true) ? '' : '.html';
+        $export_path      = $page_directory.$page_model->get_name().$static_extension;
+        file_put_contents($export_path,$page_model->get_html());
     }
 
-    private function exportPageAssets(
-        PageModel $pageModel
-    ){
-        $pageDirPath = ($pageModel->getDirPath()==='') ? '' : '/'.$pageModel->getDirPath(); 
-        $assetsDir = $this->export_dir_path.'/assets'.$pageDirPath.'/';
-        if (!is_dir($assetsDir)) mkdir($assetsDir);
+    private function export_page_assets(PageModel $page_model){
 
-        $assetsFileName = (AppSettings::build()->useRandomAssetsFileNames()===true) 
-            ? $pageModel->getId() : $pageModel->getName();
+        $page_dir_path = ($page_model->get_directory_path()==='') ? '' : '/'.$page_model->get_directory_path(); 
+        $assets_dir    = $this->export_dir_path.'/assets'.$page_dir_path.'/';
+
+        if (!is_dir($assets_dir)) mkdir($assets_dir);
+
+        $assets_file_name = (AppSettings::build()->useRandomAssetsFileNames()===true) 
+            ? $page_model->get_id() : $page_model->get_name();
             
-        $exportPath = $assetsDir.$assetsFileName.'.css';
-        file_put_contents($exportPath,$pageModel->getPageCSS());
-        $exportPath = $assetsDir.$assetsFileName.'.js';
-        file_put_contents($exportPath,$pageModel->getPageJS());
+        $export_path = $assets_dir.$assets_file_name.'.css';
+        file_put_contents($export_path,$page_model->get_css());
+
+        $exportPath = $assets_dir.$assets_file_name.'.js';
+        file_put_contents($exportPath,$page_model->get_javascript());
     }
 
-    private function importBuildFns(){
+    private function import_build_helper_functions(){
         include __dir__.'/build.functions.php';
     }
 
-    private function clearExportDir(
-        string $dirToClear
-    ){
-        foreach (scandir($dirToClear) as $file) {
+    private function clear_export_dir(string $directory_to_clear){
+        foreach (scandir($directory_to_clear) as $file) {
             if ($file==='.'||$file==='..') continue;
-            $path = $dirToClear.'/'.$file;
+            $path = $directory_to_clear.'/'.$file;
             if (is_dir($path)) {
-                $this->clearExportDir($path);
+                $this->clear_export_dir($path);
                 rmdir($path);
             } else {
                 unlink($path);
@@ -172,14 +160,12 @@ class BuildController
         }
     }
 
-    private function importGlobalVals(
-        PageModel $pageModel
-    ){
-        $GLOBALS['__page_model'] = $pageModel;
+    private function set_globals(PageModel $page_model){
+        $GLOBALS['__page_model'] = $page_model;
     }
 
-    public function postBuildServices(){
-        foreach (AppSettings::extensions()->getExtensions() as $extension) {
+    public function post_build_services(){
+        foreach (AppSettings::extensions()->get_extensions() as $extension) {
             if (method_exists($extension,'onBuildComplete')) {
                 $extension->onBuildComplete();
             }

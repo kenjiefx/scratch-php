@@ -19,9 +19,9 @@ class Template extends Command
         OutputInterface $output
         ): int
     {
-        $templateName = $input->getArgument('template_name');
-        $templateController = ContainerFactory::create()->get(TemplateController::class);
-        $templateController->createTemplate($templateName);
+        $template_name = $input->getArgument('template_name');
+        $TemplateController = ContainerFactory::create()->get(TemplateController::class);
+        $TemplateController->create_template($template_name);
         return Command::SUCCESS;
     }
 

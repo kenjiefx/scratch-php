@@ -19,13 +19,13 @@ class Theme extends Command
         OutputInterface $output
         ): int
     {
-        $nameArg = $input->getArgument('theme_name');
-        $isNewSettings = AppSettings::create($nameArg);
+        $name_from_argument = $input->getArgument('theme_name');
+        $is_new_settings = AppSettings::create($name_from_argument);
         AppSettings::load();
 
-        $themeName = $isNewSettings ? AppSettings::getThemeName() : $nameArg;
-        $themeController = new ThemeController();
-        $themeController->createTheme($themeName);
+        $theme_name = $is_new_settings ? AppSettings::get_theme_name_from_config() : $name_from_argument;
+        $ThemeController = new ThemeController();
+        $ThemeController->create_theme($theme_name);
         return Command::SUCCESS;
     }
 
