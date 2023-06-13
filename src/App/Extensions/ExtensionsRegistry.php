@@ -6,19 +6,17 @@ use Kenjiefx\ScratchPHP\App\Interfaces\ExtensionsInterface;
 class ExtensionsRegistry
 {
 
-    private array $extension_objects = [];
+    private array $ExtensionObjects = [];
     
     public function __construct(){
 
     }
 
-    public function add_extensions(
-        ExtensionsInterface $extension_object
-    ){
-        array_push($this->extension_objects,$extension_object);
+    public function registerExtension( ExtensionsInterface $ExtensionObject){
+        array_push($this->ExtensionObjects,$ExtensionObject);
     }
 
-    public function get_extensions(){
-        return $this->extension_objects;
+    public function getExtension(){
+        return $this->ExtensionObjects;
     }
 }

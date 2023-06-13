@@ -3,6 +3,7 @@
 namespace Kenjiefx\ScratchPHP\App\Pages;
 use Kenjiefx\ScratchPHP\App\Exceptions\ConfigurationException;
 use Kenjiefx\ScratchPHP\App\Pages\PageJSON;
+use Kenjiefx\ScratchPHP\App\Templates\TemplateFactory;
 
 /**
  * Handles the creation of the PageModel, because the PageModel itself requires
@@ -11,24 +12,18 @@ use Kenjiefx\ScratchPHP\App\Pages\PageJSON;
 class PageFactory
 {
 
-    private static int $page_id_incrementor = 1;
+    private static int $pageIdIncrementor = 1;
 
-    public static function create(PageJSON $page_json):PageModel{
-        $page_model = new PageModel(
-            page_id: strval(Self::$page_id_incrementor++).uniqid(),
-            bin_reference_id: self::create_bin_reference_id($page_json->get_relative_path(),$page_json->get_file_name()), 
-            page_name: $page_json->get_file_name(),
-            template_name: $page_json->get_template_name(),
-            dir_location: $page_json->get_relative_path(),
-            page_title: $page_json->get_page_title(),
-            page_data: $page_json->get_page_data()
+    public static function create(PageJSON $PageJSON):PageModel{
+        $PageModel = new PageModel(
+            pageId: strval(Self::$pageIdIncrementor++).uniqid(),
+            pageName: $PageJSON->getFileName(),
+            TemplateModel: TemplateFactory::create($PageJSON->getTemplateName()),
+            dirPath: $PageJSON->getRelPath(),
+            pageTitle: $PageJSON->getPageTitle(),
+            pageData: $PageJSON->getPageData()
         );
-        return $page_model;
+        return $PageModel;
     }
-
-    public static function create_bin_reference_id(string $relative_path, string $file_name){
-        return str_replace('/','.',$relative_path).'.'.$file_name;
-    }
-
 
 }

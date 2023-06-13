@@ -17,7 +17,7 @@ class CLIModule implements ModuleInterface
     private Application $ConsoleApplication;
     private Container $AppContainer;
 
-    public function prepare_dependencies() 
+    public function loadDependencies() 
     {
         $this->ConsoleApplication = new Application();
         $this->ConsoleApplication->add(new Build());
@@ -28,7 +28,7 @@ class CLIModule implements ModuleInterface
         $this->AppContainer->register();
     }
 
-    public function run_commands()
+    public function runModule()
     {
         $this->ConsoleApplication->run();
     }

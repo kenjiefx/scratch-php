@@ -2,7 +2,9 @@
 
 namespace Kenjiefx\ScratchPHP\App\Themes;
 use Kenjiefx\ScratchPHP\App\Exceptions\ConfigurationException;
+use Kenjiefx\ScratchPHP\App\Exceptions\ThemeAlreadyExistsException;
 use Kenjiefx\ScratchPHP\App\Exceptions\ThemeNotFoundException;
+use Kenjiefx\ScratchPHP\App\Helpers\FilesCopier;
 
 /**
  * Manages the functionality of the Theme Model. It perform actions such as retrieving theme settings, 
@@ -23,93 +25,60 @@ class ThemeController
      * of themes. By default, themes are stored in ROOT.'/theme' directory of 
      * your project.
      */
-    private string $theme_lib_path = ROOT.'/theme/';
+    private const THEME_LIB_PATH = '/theme/';
 
     /**
      * This function decides the theme that would be used throughout the build
      * process. While this method can be called multiple times, it will only
      * instantiates the ThemeModel once.  
      */
-    public function mount_theme(string $theme_name){
+    public function mount(string $name){
         if (!isset(static::$ThemeModel)) {
-            $path_to_theme_directory = $this->theme_lib_path.$theme_name;
-            if (!is_dir($path_to_theme_directory)) {
-                new ThemeNotFoundException($theme_name, $path_to_theme_directory);
+            $path = ROOT.self::THEME_LIB_PATH.$name;
+            if (!is_dir($path)) {
+                new ThemeNotFoundException($name,$path);
             }
-            static::$ThemeModel = new ThemeModel($theme_name, $path_to_theme_directory);
+            static::$ThemeModel = new ThemeModel($name,$path);
         }
     }
     
-    /**
-     * Returns the directory where Theme templates are stored.
-     */
-    public function get_template_dir_path(string $template_name){
-        return $this->get_theme_dir_path().
-            '/templates/template.'.$template_name.'.php';
+    /** Returns the file path of a certain template in the theme. */
+    public function getTemplateFilePath(string $name){
+        return $this->getThemeDirPath().'/templates/template.'.$name.'.php';
     }
 
-    /**
-     * Returns the directory where Theme components are stored.
-     */
-    public function get_component_dir_path(string $component_namde){
-        return $this->get_theme_dir_path().
-            '/components/'.$component_namde;
+    /** Returns the directory where Theme components are stored. */
+    public function getComponentsDirPath(string $name){
+        return $this->getThemeDirPath().'/components/'.$name;
     }
 
-    /**
-     * Returns the directory where Theme index file is stored.
-     */
-    public function get_index_file_path(){
-        return $this->get_theme_dir_path().'/index.php';
+    /** Returns the file path fo the theme's index file. */
+    public function getIndexFilePath(){
+        return $this->getThemeDirPath().'/index.php';
     }
 
-    /**
-     * Returns the directory where the Theme snippets are stored.
-     */
-    public function get_snippet_dir_path(string $snippet_name){
-        return $this->get_theme_dir_path()
-            .'/snippets/'.$snippet_name.'.php';
+    /** Returns the directory where the Theme snippets are stored.*/
+    public function getSnippetFilePath (string $name){
+        return $this->getThemeDirPath().'/snippets/'.$name.'.php';
     }
 
-    /**
-     * Returns the directory where Theme asset files are stored
-     */
-    public function get_assets_dir_path(){
-        return $this->get_theme_dir_path().'/assets';
+    /** Returns the directory where Theme asset files are stored */
+    public function getAssetsDirPath(){
+        return $this->getThemeDirPath().'/assets';
     }
 
-    /** 
-     * Returns the directory path of the mounted theme.
-     */
-    public function get_theme_dir_path(){
-        return static::$ThemeModel->get_dir_path();
+    /** Returns the directory path of the mounted theme. */
+    public function getThemeDirPath(){
+        return static::$ThemeModel->getDirPath();
     }
 
-    /**
-     * Creates a theme
-     */
-    public function create_theme(string $theme_name){
-        $theme_dir_path = $this->theme_lib_path.$theme_name;
-        if (is_dir($theme_dir_path)) {
-            $error  = 'Theme Already Exists! The theme you are trying to create named "';
-            $error .= $theme_dir_path.'" already exists.';
-            throw new \Exception($error);
+    /**  Creates a theme */
+    public static function create(string $name){
+        $path = ROOT.self::THEME_LIB_PATH.$name;
+        if (is_dir($path)) {
+            throw new ThemeAlreadyExistsException($name);
         }
-        mkdir($theme_dir_path);
-        $this->copy_default_theme_files(__dir__.'/bin',$theme_dir_path);
-    }
-
-    private function copy_default_theme_files(string $source_dir_path, string $destination_dir_path){
-        foreach (scandir($source_dir_path) as $file_name) {
-            if ($file_name==='.'||$file_name==='..') continue;
-            $source_file_path      = $source_dir_path.'/'.$file_name;
-            $destination_file_path = $destination_dir_path.'/'.$file_name;
-            if (is_dir($source_file_path)) {
-                mkdir($destination_file_path);
-                $this->copy_default_theme_files ($source_file_path, $destination_file_path);
-            } else {
-                copy($source_file_path, $destination_file_path);
-            }
-        }
+        mkdir($path);
+        FilesCopier::copyDir(__dir__.'/bin',$path);
     }
 }

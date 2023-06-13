@@ -1,71 +1,72 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Pages;
+use Kenjiefx\ScratchPHP\App\Templates\TemplateModel;
 
 class PageModel
 {
 
+    private string $html;
+    private string $css;
+    private string $javascript;
+
     public function __construct(
-        private string $page_id,
-        private string $bin_reference_id,
-        private string $page_name,
-        private string $template_name,
-        private string $dir_location,
-        private string $page_title,
-        private array $page_data
+        private string $pageId,
+        private string $pageName,
+        private TemplateModel $TemplateModel,
+        private string $dirPath,
+        private string $pageTitle,
+        private array $pageData
     ){
 
     }
 
-    public function get_template_name(){
-        return $this->template_name;
+    public function getTemplate(): TemplateModel{
+        return $this->TemplateModel;
     }
 
-    public function set_html(string $html_content){
-        file_put_contents($this->generate_bin_path('html'), $html_content);
+    public function setHtml(string $html){
+        $this->html = $html;
     }
 
-    public function set_css(string $css_content){
-        file_put_contents($this->generate_bin_path('css'),$css_content);
+    public function setCss(string $css){
+        $this->css = $css;
     }
 
-    public function set_javascript(string $javascript_content){
-        file_put_contents($this->generate_bin_path('js'),$javascript_content);
+    public function setJs(string $javascript){
+        $this->javascript = $javascript;
     }
 
-    public function get_html(){
-        return file_get_contents($this->generate_bin_path('html'));
+    public function getHtml(){
+        return $this->html;
     }
 
-    public function get_css(){
-        return file_get_contents($this->generate_bin_path('css'));
+    public function getCss(){
+        return $this->css;
     }
 
-    public function get_javascript(){
-        return file_get_contents($this->generate_bin_path('js'));
+    public function getJavascript(){
+        return $this->javascript;
     }
 
-    public function get_data(){
-        return $this->page_data;
+    public function getData(){
+        return $this->pageData;
     }
 
-    public function get_directory_path(){
-        return $this->dir_location;
+    public function getDirPath(){
+        return $this->dirPath;
     }
 
-    public function get_name(){
-        return $this->page_name;
+    public function getName(){
+        return $this->pageName;
     }
 
-    public function get_id(){
-        return $this->page_id;
+    public function getId(){
+        return $this->pageId;
     }
 
-    public function get_title(){
-        return $this->page_title;
+    public function getTitle(){
+        return $this->pageTitle;
     }
 
-    public function generate_bin_path(string $file_type){
-        return __dir__.'/bin/'.$this->bin_reference_id.'.'.$file_type;
-    }
 }

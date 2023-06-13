@@ -11,16 +11,18 @@ class ThemeModel
 {
     public function __construct(
         private string $name,
-        private string $path_to_theme_dir
+        private string $libPath
     ){
-
+        
     }
 
-    public function get_dir_path(){
-        return $this->path_to_theme_dir;
+    /** Returns the path of the theme in the library */
+    public function getDirPath():string {
+        return $this->libPath;
     }
 
-    public function get_name(){
+    /** Returns the name of the theme */
+    public function getName():string {
         return $this->name;
     }
 }

@@ -18,7 +18,7 @@ class App
 
     public function run()
     {
-        $this->Module->prepare_dependencies();
-        $this->Module->run_commands();
+        $this->Module->loadDependencies();
+        $this->Module->runModule();
     }
 }
