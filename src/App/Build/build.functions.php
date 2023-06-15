@@ -25,7 +25,16 @@ function template_assets(){
     $PageController = BuildHelpers::PageController();
     $pageRelPath    = $PageController->getPageRelPath();
     $pageAssetsName = $PageController->getAssetsName();
-    $assetsRelDir = '../assets'.$pageRelPath.'/'.$pageAssetsName;
+
+    $parentDirName  = 'assets';
+    $totalParentDir = count(explode('/',$pageRelPath))-1;
+    $i = 0;
+    while ($i<$totalParentDir) {
+        $parentDirName = '../'.$parentDirName;
+        $i++;
+    }
+
+    $assetsRelDir = $parentDirName.$pageRelPath.'/'.$pageAssetsName;
 
     echo '<script type="text/javascript" src="'.$assetsRelDir.'.js?v='.time().'"></script>'.PHP_EOL;
     echo '<link rel="stylesheet" href="'.$assetsRelDir.'.css?v='.time().'">';
