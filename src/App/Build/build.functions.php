@@ -1,101 +1,92 @@
 <?php 
+use Kenjiefx\ScratchPHP\App\Build\BuildHelpers;
+use Kenjiefx\ScratchPHP\App\Components\ComponentController;
+use Kenjiefx\ScratchPHP\App\Components\ComponentFactory;
 use Kenjiefx\ScratchPHP\App\Components\ComponentRegistry;
 use Kenjiefx\ScratchPHP\App\Configuration\AppSettings;
+use Kenjiefx\ScratchPHP\App\Exceptions\ComponentNotFoundException;
+use Kenjiefx\ScratchPHP\App\Exceptions\SnippetNotFoundException;
+use Kenjiefx\ScratchPHP\App\Exceptions\TemplateNotFoundException;
 use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
+use Kenjiefx\ScratchPHP\App\Pages\PageModel;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateRegistry;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
 
 function page_title(){
-    $pageModel = $GLOBALS['__page_model'];
-    echo $pageModel->getTitle();
+    $PageController = BuildHelpers::PageController();
+    echo $PageController->getPageTitle();
 }
 
 /**
  * Embeds CSS and Javascript for each of the pages
  */
 function template_assets(){
-    $pageModel = $GLOBALS['__page_model'];
-    $pageDirPath = ($pageModel->getDirPath()==='') ? '' : '/'.$pageModel->getDirPath();
+    $PageController = BuildHelpers::PageController();
+    $pageRelPath    = $PageController->getPageRelPath();
+    $pageAssetsName = $PageController->getAssetsName();
+    $assetsRelDir = '../assets'.$pageRelPath.'/'.$pageAssetsName;
 
-    $assetsFileName = (AppSettings::build()->useRandomAssetsFileNames()===true) ? $pageModel->getId() : $pageModel->getName();
-    $assetsRelativeDir = '../assets'.$pageDirPath.'/'.$assetsFileName;
-    echo '<script type="text/javascript" src="'.$assetsRelativeDir.'.js?v='.time().'"></script>'.PHP_EOL;
-    echo '<link rel="stylesheet" href="'.$assetsRelativeDir.'.css?v='.time().'">';
+    echo '<script type="text/javascript" src="'.$assetsRelDir.'.js?v='.time().'"></script>'.PHP_EOL;
+    echo '<link rel="stylesheet" href="'.$assetsRelDir.'.css?v='.time().'">';
 }
+
 
 /**
  * Renders the content of the template used by the page.
  */
 function template_content(){
-    $templateRegistry = ContainerFactory::create()->get(TemplateRegistry::class);
-    $templateName = $GLOBALS['__page_model']->getTemplateName();
-    $templatePath = $templateRegistry->getTemplatePath(templateName: $templateName);
-    include $templatePath; 
+    $PageController = BuildHelpers::PageController();
+    $templateFilePath = $PageController->getTemplate()->getFilePath();
+    if (!file_exists($templateFilePath)) {
+        throw new TemplateNotFoundException(
+            $PageController->getTemplate()->getTemplateName(),
+            $PageController->getTemplate()->getFilePath()
+        );
+    }
+    include $templateFilePath; 
 }
 
 /**
  * Renders a component into templates or other components. This 
  * function also registers the component into the Template Model.
- * @param string $componentName - The name of the component to render
+ * @param string $name - The name of the component to render
  */
-function component(
-    string $componentName
-){
-    $templateName = $GLOBALS['__page_model']->getTemplateName();
-    $templateRegistry = ContainerFactory::create()->get(TemplateRegistry::class);
-    $templateModel = $templateRegistry->getTemplateModel($templateName);
-    $componentRegistry = ContainerFactory::create()->get(ComponentRegistry::class);
-    $componentModel = $componentRegistry->register(
-        templateName: $templateName,
-        componentName :$componentName
-    );
-    $componentHtmlPath = $componentModel->getComponentHtmlPath();
-    if (!file_exists($componentHtmlPath)) {
-        $error = 'Component Not Found. Attempt to use component named "'.$componentName.'" ';
-        $error .= 'when it is not found in the theme in this path: '.$componentHtmlPath;
-        throw new \Exception($error);
+function component(string $name){
+
+    $ComponentController = new ComponentController(ComponentFactory::create($name));
+
+    # Validates whether the component exists in your theme
+    if (!file_exists($ComponentController->getHtmlPath())) {
+        throw new ComponentNotFoundException($name,$ComponentController->getHtmlPath());
     }
-    if ($templateModel->hasUsedComponent($componentName)&&!$templateModel->hasbeenFrozen()) {
-        if (!AppSettings::build()->allowReusableComponentsWithinTemplate()) {
-            $error = 'Duplicate Components Within Template! Attempt to use component "'.$componentName.'" ';
-            $error .= 'within the template "'.$templateName.'" while the setting "build.reuseComponentsWithinTemplate" ';
-            $error .= 'is enabled and set to false.';
-            throw new \Exception($error);
-        }
-    }
-    $templateModel->addComponent($componentName);
-    include $componentHtmlPath;
+    
+    $PageController = BuildHelpers::PageController();
+    $PageController->getTemplate()->registerComponent($ComponentController->getComponent());
+    include $ComponentController->getHtmlPath();
 }
 
 /**
  * Renders a snippet into templates, components, or other snippets. 
  * @TODO This function registers the snippet into the Template Model
- * @param string $snippetName = The file name of the snippet
+ * @param string $snippet_name = The file name of the snippet
  */
-function snippet(
-    string $snippetName,
-    array $data = []
-){
-    $themeController = ContainerFactory::create()->get(ThemeController::class);
-    $snippetPath = $themeController->getSnippetPath($snippetName);
-    if (!file_exists($snippetPath)) {
-        $error = 'Snippet Not Found! Attempt to use snippet named "'.$snippetName.'" ';
-        $error .= 'when it is not found in this theme in this path: '.$snippetPath;
-        throw new \Exception($error);
+function snippet(string $snippetName, array $data = []){
+    $ThemeController = ContainerFactory::create()->get(ThemeController::class);
+    $snippetFilePath = $ThemeController->getSnippetFilePath($snippetName);
+    if (!file_exists($snippetFilePath)) {
+        throw new SnippetNotFoundException($snippetName, $snippetFilePath);
     }
     $snippet = $data;
-    include $snippetPath;
+    include $snippetFilePath;
 }
 
 /**
  * Allows access to the page data declared in page.json
  * @param string field
  */
-function page_data(
-    string $field
-){
-    $pageModel = $GLOBALS['__page_model'];
-    $data = $pageModel->getPageData();
+function page_data(string $field){
+    $PageController = BuildHelpers::PageController();
+    $data = $PageController->getPageData();
     return (isset($data[$field])) ? $data[$field] : null;
 }

@@ -1,16 +1,16 @@
 <?php 
 
-namespace Kenjiefx\ScratchPHP\App\Modules;
+namespace Kenjiefx\ScratchPHP\App\Interfaces;
 
 interface ModuleInterface
 {
     /**
      * Import module dependencies
      */
-    public function importDependencies();
+    public function loadDependencies();
 
     /**
      * Runs module
      */
-    public function runCommands();
+    public function runModule();
 }

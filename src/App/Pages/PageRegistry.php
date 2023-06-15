@@ -2,48 +2,42 @@
 
 namespace Kenjiefx\ScratchPHP\App\Pages;
 
+/** 
+ * Registers and manages the pages of your static website. 
+ * This object holds an array of Page Models.
+ */
 class PageRegistry
 {
 
-    private static string $directory = '\pages';
-    private static array $pageModels;
+    /**
+     * By default, pages are referenced by JSON files stored in ROOT.'/pages' directory. 
+     * Each JSON file corresponds to a specific page and contains essential information 
+     * such as the page title and additional data required during the build process.
+     */
+    private const PAGES_DIR = '/pages';
 
-    public function __construct(
-        private PageFactory $pageFactory
-    ){
-        if (!isset(static::$pageModels)) {
-            static::$pageModels = [];
+    /** An list of paths to page.json files found in the PAGES_DIR */
+    private array $registry = [];
+
+    public function __construct(){
+        
+    }
+
+    /** Recursively crawls through the ROOT.'/pages' directory and looks for PageJSON */
+    public function discover(string|null $dirPath=null){
+        if ($dirPath===null) {
+            $dirPath = ROOT.self::PAGES_DIR;
+        }
+        foreach (scandir($dirPath) as $fileName) {
+            if ($fileName==='.'||$fileName==='..') continue;
+            $filePath = $dirPath.'/'.$fileName;
+            if (is_dir($filePath)) return $this->discover($filePath);
+            array_push($this->registry,$filePath);
         }
     }
 
-    public function discover(){
-        $pathToPages = ROOT.static::$directory;
-        $this->crawl($pathToPages);
-    }
-
-    private function crawl(string $pageDirPath){
-        $pages = scandir($pageDirPath);
-        foreach ($pages as $page) {
-            if ($page==='.'||$page==='..') continue;
-            $pagePath = $pageDirPath.'/'.$page;
-            if (is_dir($pagePath)) {
-                $this->crawl($pagePath);
-                return;
-            }
-            $id = count(static::$pageModels)+1;
-            array_push(
-                static::$pageModels,
-                $this->pageFactory::create($id.''.uniqid(),$pagePath)
-            );
-        }
-    }
-
-    public function clearBin(){
-        @array_map('unlink', array_filter((array) glob(__dir__."/bin/*") ) );
-        file_put_contents(__dir__.'/bin/README.md','');
-    }
-
-    public function getPages(){
-        return static::$pageModels;
+    public function getPages(): PageIterator{
+        $PageIterator = new PageIterator($this->registry);
+        return $PageIterator;
     }
 }

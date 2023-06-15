@@ -1,35 +1,60 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Templates;
+use Kenjiefx\ScratchPHP\App\Components\ComponentModel;
+use Kenjiefx\ScratchPHP\App\Components\ComponentsIterator;
 use Kenjiefx\ScratchPHP\App\Configuration\AppSettings;
+use Kenjiefx\ScratchPHP\App\Events\EventDispatcher;
+use Kenjiefx\ScratchPHP\App\Events\OnCreateTemplateEvent;
+use Kenjiefx\ScratchPHP\App\Exceptions\TemplateAlreadyExistsException;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
 class TemplateController
 {
 
+    private EventDispatcher $EventDispatcher;
+
     public function __construct(
-        private ThemeController $themeController
+        private TemplateModel $TemplateModel
     ){
-        AppSettings::load();
+        $this->EventDispatcher = new EventDispatcher;
     }
 
-    public function createTemplate(
-        string $templateName
-    ){
-        $this->themeController->useTheme(AppSettings::getThemeName());
-        $templatePath = $this->themeController->getTemplatePath($templateName);
+    public function getFilePath(){
+        $ThemeController = new ThemeController();
+        return $ThemeController->getTemplateFilePath($this->TemplateModel->getName());
+    }
+
+    public function getUtilizedComponents():ComponentsIterator{
+        $ComponentModels = [];
+        foreach ($this->TemplateModel->getComponents() as $Registry) {
+            array_push($ComponentModels,$Registry['model']);
+        }
+        $ComponentsIterator = new ComponentsIterator($ComponentModels);
+        return $ComponentsIterator;
+    }
+
+    public function getTemplateName(){
+        return $this->TemplateModel->getName();
+    }
+
+    public function registerComponent(ComponentModel $ComponentModel) {
+        $this->TemplateModel->registerComponent($ComponentModel);
+    }
+
+    public function createTemplate(){
+
+        $ThemeController = new ThemeController();
+        $ThemeController->mount(AppSettings::getThemeName());
+
+        $templatePath = $ThemeController->getTemplateFilePath($this->getTemplateName());
         if (file_exists($templatePath)) {
-            $error = 'Template Already Exists! The template you are trying to create named "';
-            $error .= $templateName.'" already exists in the theme.';
-            throw new \Exception($error);
+            throw new TemplateAlreadyExistsException($this->getTemplateName());
         }
-        $templateHTML = '';
-        foreach (AppSettings::extensions()->getExtensions() as $extension) {
-            if (method_exists($extension,'onCreateTemplate')) {
-                $templateHTML .= $extension->onCreateTemplate($templateHTML);
-            }
-        }
-        file_put_contents($templatePath,$templateHTML);
+
+        $templateContents = $this->EventDispatcher->dispatchEvent(OnCreateTemplateEvent::class,'');
+        file_put_contents($templatePath,$templateContents ?? '');
+
     }
 
 }

@@ -6,43 +6,48 @@ use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 class ComponentRegistry
 {
 
-    private static array $componentModels;
+    private static array $array_of_component_models;
 
     public function __construct(
-        private ThemeController $themeController
+        private ThemeController $ThemeController
     ){
-        if (!isset(static::$componentModels)) {
-            static::$componentModels = [];
+        if (!isset(static::$array_of_component_models)) {
+            static::$array_of_component_models = [];
         }
     }
 
-    public function register(
-        string $templateName,
-        string $componentName
-    ){
-        $componentStaticKey = $this->makeStaticKey($templateName,$componentName);
-        if (!isset(static::$componentModels[$componentStaticKey])) {
-            $componentDir = $this->themeController->getComponentDir($componentName);
-            $componentHtmlPath = $componentDir.'/'.$componentName.'.php';
-            $componentJsPath = $componentDir.'/'.$componentName.'.js';
-            $componentCssPath = $componentDir.'/'.$componentName.'.js';
-            $componentModel = new ComponentModel(
-                componentName: $componentName,
-                templateRefName: $templateName, 
-                componentHtmlPath: $componentHtmlPath,
-                componentJsPath: $componentJsPath,
-                componentCssPath: $componentCssPath
+    public function register(string $template_name, string $component_name):ComponentModel{
+
+        # Creates a new ID for this component, will be used as reference in the static:$array_of_component_models
+        $component_id = $this->make_id($template_name, $component_name);
+
+        if (!isset(static::$array_of_component_models[$component_id])) {
+
+            # Usable paths within the application
+            $component_dir_path  = $this->ThemeController->get_component_dir_path($component_name);
+            $component_html_path = $component_dir_path.'/'.$component_name.'.php';
+            $component_js_path   = $component_dir_path.'/'.$component_name.'.js';
+            $component_css_path  = $component_dir_path.'/'.$component_name.'.css';
+
+            $component_model = new ComponentModel(
+                name:          $component_name,
+                template_name: $template_name, 
+                html_path:     $component_html_path,
+                js_path:       $component_js_path,
+                css_path:      $component_css_path
             );
-        } else {
-            $componentModel = static::$componentModels[$componentStaticKey];
-        }
-        return $componentModel;
+
+            static::$array_of_component_models[$component_id] = $component_model;
+        } 
+
+        return static::$array_of_component_models[$component_id];
     }
 
-    public function makeStaticKey(
-        string $templateName,
-        string $componentName
-    ){
-        return $templateName.':'.$componentName;
+    public function make_id(string $template_name, string $component_name){
+        return $template_name.':'.$component_name;
+    }
+
+    public function get_registered_components(){
+        return static::$array_of_component_models;
     }
 }

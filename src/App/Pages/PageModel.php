@@ -1,58 +1,56 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Pages;
+use Kenjiefx\ScratchPHP\App\Templates\TemplateModel;
 
 class PageModel
 {
 
+    private string $html;
+    private string $css;
+    private string $javascript;
+
     public function __construct(
-        private string $id,
-        private string $binId,
-        private string $name,
-        private string $templateName,
+        private string $pageId,
+        private string $pageName,
+        private TemplateModel $TemplateModel,
         private string $dirPath,
-        private string $title,
-        private array $data
+        private string $pageTitle,
+        private array $pageData
     ){
 
     }
 
-    public function getTemplateName(){
-        return $this->templateName;
+    public function getTemplate(): TemplateModel{
+        return $this->TemplateModel;
     }
 
-    public function setPageHTML(
-        string $contentHTML
-    ){
-        file_put_contents($this->getBinPath('html'),$contentHTML);
+    public function setHtml(string $html){
+        $this->html = $html;
     }
 
-    public function setPageCSS(
-        string $contentCSS
-    ){
-        file_put_contents($this->getBinPath('css'),$contentCSS);
+    public function setCss(string $css){
+        $this->css = $css;
     }
 
-    public function setPageJS(
-        string $contentJS
-    ){
-        file_put_contents($this->getBinPath('js'),$contentJS);
+    public function setJs(string $javascript){
+        $this->javascript = $javascript;
     }
 
-    public function getPageHTML(){
-        return file_get_contents($this->getBinPath('html'));
+    public function getHtml(){
+        return $this->html;
     }
 
-    public function getPageCSS(){
-        return file_get_contents($this->getBinPath('css'));
+    public function getCss(){
+        return $this->css;
     }
 
-    public function getPageJS(){
-        return file_get_contents($this->getBinPath('js'));
+    public function getJavascript(){
+        return $this->javascript;
     }
 
-    public function getPageData(){
-        return $this->data;
+    public function getData(){
+        return $this->pageData;
     }
 
     public function getDirPath(){
@@ -60,21 +58,15 @@ class PageModel
     }
 
     public function getName(){
-        return $this->name;
+        return $this->pageName;
     }
 
     public function getId(){
-        return $this->id;
+        return $this->pageId;
     }
 
     public function getTitle(){
-        return $this->title;
+        return $this->pageTitle;
     }
 
-    public function getBinPath(
-        string $fileType
-    ){
-        return __dir__.'/bin/'.
-            $this->binId.'.'.$fileType;
-    }
 }

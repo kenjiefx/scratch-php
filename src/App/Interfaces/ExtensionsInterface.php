@@ -10,15 +10,15 @@ interface ExtensionsInterface
      * HTML, recently compiled from the build phase.
      * @param string $rawPageHTML
      */
-    public function mutatePageHTML(string $pageHTML):string;
+    // public function mutatePageHTML(string $pageHTML):string;
 
-    public function mutatePageCSS(string $pageCSS):string;
+    // public function mutatePageCSS(string $pageCSS):string;
 
-    public function mutatePageJS(string $pageJS):string;
+    // public function mutatePageJS(string $pageJS):string;
 
-    public function onCreateComponentContent(ComponentModel $componentModel, string $content):string;
+    // public function onCreateComponentContent(ComponentModel $componentModel, string $content):string;
 
-    public function onCreateComponentCSS(ComponentModel $componentModel, string $css): string;
+    // public function onCreateComponentCSS(ComponentModel $componentModel, string $css): string;
 
-    public function onCreateComponentJS(ComponentModel $componentModel, string $js): string;
+    // public function onCreateComponentJS(ComponentModel $componentModel, string $js): string;
 }

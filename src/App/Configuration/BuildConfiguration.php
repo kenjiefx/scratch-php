@@ -15,15 +15,6 @@ class BuildConfiguration
         
     }
 
-    public function useReadableComponentNames()
-    {
-        return $this->configuration['useReadableComponentName'] ?? false;
-    }
-
-    public function allowReusableComponentsWithinTemplate(){
-        return $this->configuration['reuseComponentsWithinTemplate'] ?? true;
-    }
-
     public function exportPageWithoutHTMLExtension(){
         return $this->configuration['exportPageWithoutHTMLExtension'] ?? false;
     }

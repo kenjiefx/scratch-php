@@ -6,7 +6,7 @@ use Kenjiefx\ScratchPHP\App\Commands\Build;
 use Kenjiefx\ScratchPHP\App\Commands\Create\Component;
 use Kenjiefx\ScratchPHP\App\Commands\Create\Template;
 use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
-use Kenjiefx\ScratchPHP\App\Modules\ModuleInterface;
+use Kenjiefx\ScratchPHP\App\Interfaces\ModuleInterface;
 use Kenjiefx\ScratchPHP\Container;
 use Kenjiefx\ScratchPHP\App\Commands\Create\Theme;
 use Symfony\Component\Console\Application;
@@ -17,7 +17,7 @@ class CLIModule implements ModuleInterface
     private Application $ConsoleApplication;
     private Container $AppContainer;
 
-    public function importDependencies() 
+    public function loadDependencies() 
     {
         $this->ConsoleApplication = new Application();
         $this->ConsoleApplication->add(new Build());
@@ -28,7 +28,7 @@ class CLIModule implements ModuleInterface
         $this->AppContainer->register();
     }
 
-    public function runCommands()
+    public function runModule()
     {
         $this->ConsoleApplication->run();
     }

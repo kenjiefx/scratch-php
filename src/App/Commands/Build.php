@@ -1,7 +1,7 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Commands;
-use Kenjiefx\ScratchPHP\App\Build\BuildController;
+use Kenjiefx\ScratchPHP\App\Build\BuildService;
 use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -18,8 +18,8 @@ class Build extends Command
         OutputInterface $output
         ): int
     {
-        $buildController = ContainerFactory::create()->get(BuildController::class);
-        $buildController->buildSite();
+        $BuildService = ContainerFactory::create()->get(BuildService::class);
+        $BuildService->buildPage();
         return Command::SUCCESS;
     }
 

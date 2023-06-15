@@ -1,6 +1,8 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Templates;
+use Kenjiefx\ScratchPHP\App\Components\ComponentModel;
+use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
 
 class TemplateModel
 {
@@ -10,65 +12,36 @@ class TemplateModel
      * You can use the name to retrieve the specific Component Model 
      * from the Component Registry
      */
-    private array $componentUsage = [];
-
-    /**
-     * All template information are registered into the Template Object. 
-     * However, since this application will render different pages which could 
-     * be using the same template, duplicate information might get registered,
-     * thus, we set the isFrozen value to TRUE after the processing of the 
-     * very first page that is using this template.
-     */
-    private bool $isFrozen = false;
+    private array $components = [];
 
     public function __construct(
-        private string $id,
-        private string $name,
-        private string $templatePath
+        private string $name
     ){
         
     }
 
-    public function getTemplatePath(){
-        return $this->templatePath;
+    public function getName():string {
+        return $this->name;
     }
 
-    public function hasUsedComponent(
-        string $componentName
-    ){
-        return isset($this->componentUsage[$componentName]);
+
+    public function hasUsedComponent(string $name){
+        return isset($this->components[$name]);
     }
 
-    public function addComponent(
-        string $componentName
-    ){
-        if ($this->isFrozen) return;
-        if (!isset($this->componentUsage[$componentName])) {
-            $this->componentUsage[$componentName] = [
-                'name' => $componentName,
+    public function registerComponent (ComponentModel $ComponentModel){
+        $componentName = $ComponentModel->getName();
+        if (!isset($this->components[$componentName])) {
+            $this->components[$componentName] = [
+                'model' => $ComponentModel,
                 'usage' => 0
             ];
         }
-        $this->componentUsage[$componentName]['usage']++;
+        $this->components[$componentName]['usage']++;
     }
 
-    public function listUsedComponents(){
-        $components = [];
-        foreach ($this->componentUsage as $name => $information) {
-            array_push($components,$name);
-        }
-        return $components;
+    public function getComponents(){
+        return $this->components;
     }
 
-    public function hasbeenFrozen(){
-        return $this->isFrozen;
-    }
-
-    public function getId(){
-        return $this->id;
-    }
-
-    public function freeze() {
-        $this->isFrozen = true;
-    }
 }
