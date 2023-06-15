@@ -48,7 +48,7 @@ class ExportService
         if (!is_dir($pageAssetsDir)) mkdir($pageAssetsDir);
         $this->clearExportDir($pageAssetsDir);
 
-        $assetFileName = (AppSettings::build()->useRandomAssetsFileNames()===true) 
+        $assetFileName = (AppSettings::build()->useRandomAssetsFileNames()) 
             ? $this->PageController->getPageId() : $this->PageController->getPageName();
         
         $cssExportPath = $pageAssetsDir.$assetFileName.'.css';
