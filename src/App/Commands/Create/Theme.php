@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: 'create:theme')]
+#[AsCommand(name:'create:theme')]
 class Theme extends Command
 {
     protected static $defaultDescription = 'Creates a new theme';
@@ -19,13 +19,12 @@ class Theme extends Command
         OutputInterface $output
         ): int
     {
-        $name_from_argument = $input->getArgument('theme_name');
-        $is_new_settings = AppSettings::create($name_from_argument);
+        $themeName = $input->getArgument('theme_name');
+        $isNewSettings = AppSettings::create($themeName);
         AppSettings::load();
 
-        $theme_name = $is_new_settings ? AppSettings::get_theme_name_from_config() : $name_from_argument;
-        $ThemeController = new ThemeController();
-        $ThemeController->create_theme($theme_name);
+        $themeName = $isNewSettings ? AppSettings::getThemeName() : $themeName;
+        ThemeController::create($themeName);
         return Command::SUCCESS;
     }
 

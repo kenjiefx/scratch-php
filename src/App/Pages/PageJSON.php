@@ -45,6 +45,7 @@ class PageJSON
         $fileNamePos = count($pathTokens) - 1;
         [$this->fileName,] = explode('.',$pathTokens[$fileNamePos]);
         array_shift($pathTokens);
+        array_shift($pathTokens);
         array_pop($pathTokens);
         $this->relPath = implode('/',$pathTokens);
     }

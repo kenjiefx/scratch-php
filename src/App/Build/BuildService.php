@@ -2,6 +2,7 @@
 
 namespace Kenjiefx\ScratchPHP\App\Build;
 use Kenjiefx\ScratchPHP\App\Configuration\AppSettings;
+use Kenjiefx\ScratchPHP\App\Export\ExportService;
 use Kenjiefx\ScratchPHP\App\Pages\PageController;
 use Kenjiefx\ScratchPHP\App\Pages\PageRegistry;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
@@ -36,7 +37,7 @@ class BuildService
         $PageController->setPageHtml($this->bufferOutput());
         $PageController->setPageCss($this->collectCss());
         $PageController->setPageJs($this->collectJs());
-
+        $this->exportPage($PageController);
     }
 
     private function bufferOutput():string{
@@ -59,5 +60,10 @@ class BuildService
         );
     }
 
+    private function exportPage(PageController $PageController){
+        $ExportService = new ExportService($PageController);
+        $ExportService->pageHtml();
+        $ExportService->pageAssets();
+    }
 
 }

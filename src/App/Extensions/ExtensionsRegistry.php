@@ -12,7 +12,7 @@ class ExtensionsRegistry
 
     }
 
-    public function registerExtension( ExtensionsInterface $ExtensionObject){
+    public function registerExtension(ExtensionsInterface $ExtensionObject){
         array_push($this->ExtensionObjects,$ExtensionObject);
     }
 

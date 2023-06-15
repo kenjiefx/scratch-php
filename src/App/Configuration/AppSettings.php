@@ -2,10 +2,6 @@
 
 namespace Kenjiefx\ScratchPHP\App\Configuration;
 use Kenjiefx\ScratchPHP\App\Exceptions\ConfigurationException;
-use Kenjiefx\ScratchPHP\App\Exceptions\MustImplementExtensionInterfaceException;
-use Kenjiefx\ScratchPHP\App\Extensions\ExtensionsRegistry;
-use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
-use Kenjiefx\ScratchPHP\App\Interfaces\ExtensionsInterface;
 
 class AppSettings
 {
@@ -28,7 +24,7 @@ class AppSettings
      */
     private static BuildConfiguration $BuildConfiguration; 
 
-    private static ExtensionsRegistry $ExtensionsRegistry;
+    private static ExtensionConfiguration $ExtensionConfiguration;
 
     /**
      * Loads strawberry configuration file
@@ -48,9 +44,9 @@ class AppSettings
                 static::$BuildConfiguration = new BuildConfiguration(static::$configuration['build']);
             }
 
-            static::$ExtensionsRegistry = new ExtensionsRegistry();
             if (isset(static::$configuration['extensions'])) {
-                Self::mountExtensions();
+                static::$ExtensionConfiguration = new ExtensionConfiguration();
+                static::$ExtensionConfiguration::mountExtensions(static::$configuration['extensions']);
             }
 
             static::$isInitialized = true;
@@ -60,26 +56,6 @@ class AppSettings
 
     private static function unpackJson (string $configJson):array{
         return json_decode($configJson,TRUE);
-    }
-
-    private static function mountExtensions(){
-
-        foreach (static::$configuration['extensions'] as $extensionNamespace => $extensionSettings) {
-            $ReflectionObject = new \ReflectionClass($extensionNamespace);
-
-            if (!$ReflectionObject->implementsInterface(ExtensionsInterface::class)) {
-                throw new MustImplementExtensionInterfaceException($extensionNamespace);
-            }
-            $ExtensionObject = ContainerFactory::create()->get($extensionNamespace);
-            
-            foreach ($ReflectionObject->getMethods() as $ReflectionMethod) {
-                foreach ($ReflectionMethod->getAttributes() as $ReflectionAttribute) {
-                    $Attribute = $ReflectionAttribute->newInstance();
-                }
-            }
-
-            static::$ExtensionsRegistry->registerExtension($ExtensionObject);
-        }
     }
 
     /** Returns the path of the strawberry configuration file */
@@ -103,7 +79,7 @@ class AppSettings
     }
 
     public static function extensions(){
-        return static::$ExtensionsRegistry;
+        return static::$ExtensionConfiguration;
     }
 
     public static function create(string $themeName){
