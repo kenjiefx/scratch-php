@@ -2,6 +2,7 @@
 
 namespace Kenjiefx\ScratchPHP\App\Commands\Create;
 use Kenjiefx\ScratchPHP\App\Components\ComponentController;
+use Kenjiefx\ScratchPHP\App\Components\ComponentModel;
 use Kenjiefx\ScratchPHP\App\Configuration\AppSettings;
 use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
@@ -22,10 +23,11 @@ class Component extends Command
         OutputInterface $output
         ): int
     {
-        $component_name = $input->getArgument('component_name');
-        $ComponentController = ContainerFactory::create()->get(ComponentController::class);
-        $ComponentController->create_component($component_name,[
-            'apply_extensions' => !$input->getOption('clean')
+        AppSettings::load();
+        $componentName = $input->getArgument('component_name');
+        $ComponentController = new ComponentController(new ComponentModel($componentName));
+        $ComponentController->createComponent([
+            'applyExtensions' => !$input->getOption('clean')
         ]);
         return Command::SUCCESS;
     }

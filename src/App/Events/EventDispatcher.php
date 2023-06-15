@@ -14,7 +14,7 @@ class EventDispatcher
     public function dispatchEvent(string $EventName, mixed $data){
         if (!isset(static::$Events[$EventName])) return null;
         foreach (static::$Events[$EventName] as $ExtensionNamespace => $ReflectionMethod) {
-            $data = $ReflectionMethod->invoke(new $ExtensionNamespace,$data);
+            $data = $ReflectionMethod->invoke(new $ExtensionNamespace, $data);
         }
         return $data;
     }

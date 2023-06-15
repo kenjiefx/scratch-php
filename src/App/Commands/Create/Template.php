@@ -1,8 +1,10 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Commands\Create;
+use Kenjiefx\ScratchPHP\App\Configuration\AppSettings;
 use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateController;
+use Kenjiefx\ScratchPHP\App\Templates\TemplateModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,9 +21,10 @@ class Template extends Command
         OutputInterface $output
         ): int
     {
-        $template_name = $input->getArgument('template_name');
-        $TemplateController = ContainerFactory::create()->get(TemplateController::class);
-        $TemplateController->create_template($template_name);
+        AppSettings::load();
+        $templateName = $input->getArgument('template_name');
+        $TemplateController = new TemplateController(new TemplateModel($templateName));
+        $TemplateController->createTemplate();
         return Command::SUCCESS;
     }
 
