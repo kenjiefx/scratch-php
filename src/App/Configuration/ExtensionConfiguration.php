@@ -34,6 +34,7 @@ class ExtensionConfiguration
                     $EventDispatcher->registerEvent(
                         EventName: $Attribute->getEvent()->getName(),
                         ExtensionNamespace: $extensionNamespace,
+                        ExtensionObject: $ExtensionObject,
                         ReflectionMethod: $ReflectionMethod
                     );
 

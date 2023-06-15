@@ -36,7 +36,7 @@ class PageController
     }
 
     public function getPageId(){
-        $this->PageModel->getId();
+        return $this->PageModel->getId();
     }
 
     public function getAssetsName(){
