@@ -13,12 +13,12 @@ class ExportService
 
     }
 
-    public function clearExportDir(string $exportDirPath){
+    public static function clearExportDir(string $exportDirPath){
         foreach (scandir($exportDirPath) as $file) {
             if ($file==='.'||$file==='..') continue;
             $path = $exportDirPath.'/'.$file;
             if (is_dir($path)) {
-                $this->clearExportDir($path);
+                ExportService::clearExportDir($path);
                 rmdir($path);
             } else {
                 unlink($path);
@@ -27,26 +27,28 @@ class ExportService
     }
 
     public function pageHtml(){
-
-        $pageDir = $this->getExportDirPath().$this->PageController->getPageRelPath().'/';
-        if (!is_dir($pageDir)) mkdir($pageDir);
-        $this->clearExportDir($pageDir);
+        $pageDir = $this->relativeToRealPath($this->PageController->getPageRelPath());
+        
+        if (!is_dir($pageDir)) {
+            mkdir($pageDir);
+            $pageDir = $pageDir.'/';
+        }
 
         $fileExt  = (AppSettings::build()->exportPageWithoutHTMLExtension() === true) ? '' : '.html';
         $filePath = $pageDir.$this->PageController->getPageName().$fileExt;
+
         file_put_contents($filePath,$this->PageController->getPageHtml());
     }
 
     public function pageAssets(){
 
-        $assetsDir = $this->getExportDirPath().'assets';
+        $assetsDir = ExportService::getExportDirPath().'assets';
         if (!is_dir($assetsDir)) mkdir($assetsDir);
 
         $relPageDir    = $this->PageController->getPageRelPath();
         $pageAssetsDir = ($relPageDir==='') ? $assetsDir.'/' : $assetsDir.$relPageDir.'/';
 
         if (!is_dir($pageAssetsDir)) mkdir($pageAssetsDir);
-        $this->clearExportDir($pageAssetsDir);
 
         $assetFileName = (AppSettings::build()->useRandomAssetsFileNames()) 
             ? $this->PageController->getPageId() : $this->PageController->getPageName();
@@ -59,8 +61,15 @@ class ExportService
 
     }
 
-    public function getExportDirPath(){
+    public static function getExportDirPath(){
         return ROOT.AppSettings::getExportDirPath().'/';
+    }
+
+    private function relativeToRealPath(string $relPath){
+        if ($relPath!=='') {
+            $relPath = ltrim($relPath,$relPath[0]);
+        }
+        return ExportService::getExportDirPath().$relPath;
     }
 
 

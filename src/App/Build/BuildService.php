@@ -21,6 +21,7 @@ class BuildService
     ){
         include __dir__.'/build.functions.php';
         AppSettings::load();
+        ExportService::clearExportDir(ExportService::getExportDirPath());
     }
 
     public function buildPage (PageController|null $PageController = null){
@@ -31,6 +32,7 @@ class BuildService
             foreach ($this->PageRegistry->getPages() as $key => $PageController) {
                 $this->buildPage($PageController);
             }
+            return;
         }
 
         BuildHelpers::PageController($PageController);

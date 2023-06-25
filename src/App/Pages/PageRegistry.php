@@ -31,8 +31,11 @@ class PageRegistry
         foreach (scandir($dirPath) as $fileName) {
             if ($fileName==='.'||$fileName==='..') continue;
             $filePath = $dirPath.'/'.$fileName;
-            if (is_dir($filePath)) return $this->discover($filePath);
-            array_push($this->registry,$filePath);
+            if (is_dir($filePath)) { 
+                $this->discover($filePath);
+            } else {
+                array_push($this->registry,$filePath);
+            }
         }
     }
 
