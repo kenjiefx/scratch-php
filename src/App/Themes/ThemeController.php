@@ -1,6 +1,8 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Themes;
+use Kenjiefx\ScratchPHP\App\Events\EventDispatcher;
+use Kenjiefx\ScratchPHP\App\Events\OnCreateThemeEvent;
 use Kenjiefx\ScratchPHP\App\Exceptions\ConfigurationException;
 use Kenjiefx\ScratchPHP\App\Exceptions\ThemeAlreadyExistsException;
 use Kenjiefx\ScratchPHP\App\Exceptions\ThemeNotFoundException;
@@ -73,12 +75,27 @@ class ThemeController
     }
 
     /**  Creates a theme */
-    public static function create(string $name){
+    public static function create(string $name,array $options){
         $path = ROOT.self::THEME_LIB_PATH.$name;
         if (is_dir($path)) {
             throw new ThemeAlreadyExistsException($name);
         }
         mkdir($path);
-        FilesCopier::copyDir(__dir__.'/bin',$path);
+
+        if ($options['useScratchWelcomeTheme']) {
+            FilesCopier::copyDir(__dir__.'/bin',$path);
+        } else {
+            FilesCopier::copyDir(__dir__.'/default',$path);
+            mkdir($path.'/assets');
+            mkdir($path.'/components');
+            mkdir($path.'/snippets');
+        }
+        
+
+        /** Dispatches event registered under OnCreateThemeEvents */
+        $themeController = new ThemeController();
+        $themeController->mount($name);
+        $EventDispatcher = new EventDispatcher;
+        $EventDispatcher->dispatchEvent(OnCreateThemeEvent::class,$themeController);
     }
 }

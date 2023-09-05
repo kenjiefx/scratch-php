@@ -45,8 +45,10 @@ class ComponentController
             throw new ComponentAlreadyExistsException($dirPath);
         }
 
+        $jsFileType = ($options['useTypeScript']) ? '.ts' : '.js';
+
         $htmlPath = $dirPath.'/'.$this->ComponentModel->getName().'.php';
-        $jsPath   = $dirPath.'/'.$this->ComponentModel->getName().'.js';
+        $jsPath   = $dirPath.'/'.$this->ComponentModel->getName().$jsFileType;
         $cssPath  = $dirPath.'/'.$this->ComponentModel->getName().'.css';
 
         $this->ComponentModel->setHtml('');

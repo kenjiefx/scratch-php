@@ -24,6 +24,8 @@ class AppSettings
      */
     private static BuildConfiguration $BuildConfiguration; 
 
+    private static CreateConfiguration $CreateConfiguration;
+
     private static ExtensionConfiguration $ExtensionConfiguration;
 
     /**
@@ -38,11 +40,9 @@ class AppSettings
             if (!file_exists(Self::getConfigFilePath())) throw new ConfigurationException();
 
             # Next, we store the configuration data
-            static::$configuration = Self::unpackJson(file_get_contents(Self::getConfigFilePath()));
-            
-            if (isset(static::$configuration['build'])) {
-                static::$BuildConfiguration = new BuildConfiguration(static::$configuration['build']);
-            }
+            static::$configuration       = Self::unpackJson(file_get_contents(Self::getConfigFilePath()));
+            static::$BuildConfiguration  = new BuildConfiguration(static::$configuration['build'] ?? []);
+            static::$CreateConfiguration = new CreateConfiguration(static::$configuration['create'] ?? []);
 
             if (isset(static::$configuration['extensions'])) {
                 static::$ExtensionConfiguration = new ExtensionConfiguration();
@@ -98,6 +98,12 @@ class AppSettings
         }
         return false;
     }
+
+    public static function createConfig(){
+        return static::$CreateConfiguration;
+    }
+
+
 
 
 }

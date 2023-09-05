@@ -6,7 +6,9 @@ use Kenjiefx\ScratchPHP\App\Events\ListensTo;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildHtmlEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildJsEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateComponentHtmlEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnCreateThemeEvent;
 use Kenjiefx\ScratchPHP\App\Interfaces\ExtensionsInterface;
+use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
 class ExampleExtension implements ExtensionsInterface
 {
@@ -26,5 +28,11 @@ class ExampleExtension implements ExtensionsInterface
         $html = $ComponentController->getComponent()->getHtml();
         $ComponentController->getComponent()->setHtml($html.'Hello world');
         return null;
+    }
+
+    #[ListensTo(OnCreateThemeEvent::class)]
+    public function doSomethingAfterThemeIsCreated(ThemeController $ThemeController){
+        $testSnippet = $ThemeController->getThemeDirPath().'/snippets/test.snippet.php';
+        file_put_contents($testSnippet,'Hello, this is created using extension!');
     }
 }
