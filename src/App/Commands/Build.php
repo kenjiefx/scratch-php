@@ -6,6 +6,7 @@ use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'build')]
@@ -19,13 +20,16 @@ class Build extends Command
         ): int
     {
         $BuildService = ContainerFactory::create()->get(BuildService::class);
-        $BuildService->buildPage();
+        $BuildService->buildPage(null,[
+            'buildMode' => $input->getOption('buildMode') ?? 'default'
+        ]);
         return Command::SUCCESS;
     }
 
     protected function configure(): void
     {
-        $this->setHelp('This command allows you build your app.');
+        $this->setHelp('This command allows you build your app.')
+             ->addOption('buildMode',null,InputOption::VALUE_OPTIONAL,'Create component without modification from your extensions?');
     }
 
 

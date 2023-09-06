@@ -41,6 +41,11 @@ function template_assets(){
 }
 
 
+function get_assets_name(){
+    return (BuildHelpers::PageController())->getAssetsName();
+}
+
+
 /**
  * Renders the content of the template used by the page.
  */
