@@ -48,6 +48,10 @@ class PageController
         return $this->PageModel->getData();
     }
 
+    public function addPageData(string $key,mixed $value){
+        $this->PageModel->addPageData($key,$value);
+    }
+
     public function setPageHtml(string $pageHtml){
         $modifiedHtml = $this->EventDispatcher->dispatchEvent(OnBuildHtmlEvent::class,$pageHtml);
         if ($modifiedHtml!==null) $pageHtml = $modifiedHtml;

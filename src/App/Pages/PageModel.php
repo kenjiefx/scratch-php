@@ -37,6 +37,10 @@ class PageModel
         $this->javascript = $javascript;
     }
 
+    public function addPageData(string $key,mixed $value){
+        $this->pageData[$key] = $value;
+    }
+
     public function getHtml(){
         return $this->html;
     }

@@ -24,13 +24,14 @@ class BuildService
         ExportService::clearExportDir(ExportService::getExportDirPath());
     }
 
-    public function buildPage (PageController|null $PageController = null){
+    public function buildPage (PageController|null $PageController = null,array $options){
 
         if ($PageController===null) {
             $this->ThemeController->mount(AppSettings::getThemeName());
             $this->PageRegistry->discover();
             foreach ($this->PageRegistry->getPages() as $key => $PageController) {
-                $this->buildPage($PageController);
+                $PageController->addPageData('buildMode',$options['buildMode']);
+                $this->buildPage($PageController,$options);
             }
             return;
         }

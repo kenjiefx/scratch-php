@@ -4,6 +4,7 @@ namespace Kenjiefx\ScratchPHP\App\Commands\Create;
 use Kenjiefx\ScratchPHP\App\Components\ComponentController;
 use Kenjiefx\ScratchPHP\App\Components\ComponentModel;
 use Kenjiefx\ScratchPHP\App\Configuration\AppSettings;
+use Kenjiefx\ScratchPHP\App\Configuration\CreateConfiguration;
 use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -27,7 +28,8 @@ class Component extends Command
         $componentName = $input->getArgument('component_name');
         $ComponentController = new ComponentController(new ComponentModel($componentName));
         $ComponentController->createComponent([
-            'applyExtensions' => !$input->getOption('clean')
+            'applyExtensions' => !$input->getOption('clean'),
+            'useTypeScript' => AppSettings::createConfig()->useComponentTypeScript()
         ]);
         return Command::SUCCESS;
     }
