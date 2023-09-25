@@ -3,6 +3,7 @@
 namespace Kenjiefx\ScratchPHP\Extensions;
 use Kenjiefx\ScratchPHP\App\Components\ComponentController;
 use Kenjiefx\ScratchPHP\App\Events\ListensTo;
+use Kenjiefx\ScratchPHP\App\Events\OnBuildCompleteEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildHtmlEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildJsEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateComponentHtmlEvent;
@@ -34,5 +35,10 @@ class ExampleExtension implements ExtensionsInterface
     public function doSomethingAfterThemeIsCreated(ThemeController $ThemeController){
         $testSnippet = $ThemeController->getThemeDirPath().'/snippets/test.snippet.php';
         file_put_contents($testSnippet,'Hello, this is created using extension!');
+    }
+
+    #[ListensTo(OnBuildCompleteEvent::class)]
+    public function doSomethingAfterBuildCommand(string $exportDirPath){
+        file_put_contents($exportDirPath.'/test.html','Hello World!');
     }
 }

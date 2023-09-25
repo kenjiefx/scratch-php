@@ -23,6 +23,7 @@ class Build extends Command
         $BuildService->buildPage(null,[
             'buildMode' => $input->getOption('buildMode') ?? 'default'
         ]);
+        $BuildService->completeBuild();
         return Command::SUCCESS;
     }
 
