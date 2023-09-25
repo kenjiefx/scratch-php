@@ -8,15 +8,23 @@ use Kenjiefx\ScratchPHP\App\Events\OnBuildHtmlEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildJsEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateComponentHtmlEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateThemeEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnSettingsRegistryEvent;
 use Kenjiefx\ScratchPHP\App\Interfaces\ExtensionsInterface;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
 class ExampleExtension implements ExtensionsInterface
 {
 
+    private array $extensionSettings = [];
+
     #[ListensTo(OnBuildHtmlEvent::class)]
     public function processHtml(string $html){
         return $html;
+    }
+
+    #[ListensTo(OnSettingsRegistryEvent::class)]
+    public function registerSettings(array $settings){
+        $this->extensionSettings = $settings;
     }
 
     #[ListensTo(OnBuildJsEvent::class)]
@@ -39,6 +47,8 @@ class ExampleExtension implements ExtensionsInterface
 
     #[ListensTo(OnBuildCompleteEvent::class)]
     public function doSomethingAfterBuildCommand(string $exportDirPath){
+        if (!isset($this->extensionSettings['createTestHtml'])) return;
+        if (!$this->extensionSettings['createTestHtml']) return;
         file_put_contents($exportDirPath.'/test.html','Hello World!');
     }
 }
