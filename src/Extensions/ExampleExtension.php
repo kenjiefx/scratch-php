@@ -8,6 +8,7 @@ use Kenjiefx\ScratchPHP\App\Events\OnBuildHtmlEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildJsEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateComponentHtmlEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateThemeEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnDeployEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnSettingsRegistryEvent;
 use Kenjiefx\ScratchPHP\App\Interfaces\ExtensionsInterface;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
@@ -50,5 +51,10 @@ class ExampleExtension implements ExtensionsInterface
         if (!isset($this->extensionSettings['createTestHtml'])) return;
         if (!$this->extensionSettings['createTestHtml']) return;
         file_put_contents($exportDirPath.'/test.html','Hello World!');
+    }
+
+    #[ListensTo(OnDeployEvent::class)]
+    public function deployApp(){
+        echo 'App is deployed!';
     }
 }
