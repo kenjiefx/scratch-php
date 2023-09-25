@@ -2,6 +2,7 @@
 
 namespace Kenjiefx\ScratchPHP\App\Configuration;
 use Kenjiefx\ScratchPHP\App\Events\EventDispatcher;
+use Kenjiefx\ScratchPHP\App\Events\OnSettingsRegistryEvent;
 use Kenjiefx\ScratchPHP\App\Exceptions\MustImplementExtensionInterfaceException;
 use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
 use Kenjiefx\ScratchPHP\App\Extensions\ExtensionsRegistry;
@@ -31,6 +32,11 @@ class ExtensionConfiguration
 
                     $Attribute = $ReflectionAttribute->newInstance();
 
+                    if ($Attribute->getEvent()->getName()===OnSettingsRegistryEvent::class) {
+                        $ReflectionMethod->invoke($ExtensionObject,$extensionSettings);
+                        continue;
+                    }
+
                     $EventDispatcher->registerEvent(
                         EventName: $Attribute->getEvent()->getName(),
                         ExtensionNamespace: $extensionNamespace,
@@ -40,6 +46,8 @@ class ExtensionConfiguration
 
                 }
             }
+
+
 
             static::$ExtensionsRegistry->registerExtension($ExtensionObject);
         }

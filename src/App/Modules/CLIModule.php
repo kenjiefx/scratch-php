@@ -5,6 +5,7 @@ namespace Kenjiefx\ScratchPHP\App\Modules;
 use Kenjiefx\ScratchPHP\App\Commands\Build;
 use Kenjiefx\ScratchPHP\App\Commands\Create\Component;
 use Kenjiefx\ScratchPHP\App\Commands\Create\Template;
+use Kenjiefx\ScratchPHP\App\Commands\Deploy;
 use Kenjiefx\ScratchPHP\App\Factory\ContainerFactory;
 use Kenjiefx\ScratchPHP\App\Interfaces\ModuleInterface;
 use Kenjiefx\ScratchPHP\Container;
@@ -24,6 +25,7 @@ class CLIModule implements ModuleInterface
         $this->ConsoleApplication->add(new Component());
         $this->ConsoleApplication->add(new Template());
         $this->ConsoleApplication->add(new Theme());
+        $this->ConsoleApplication->add(new Deploy());
         $this->AppContainer = new Container(ContainerFactory::create());
         $this->AppContainer->register();
     }

@@ -2,6 +2,8 @@
 
 namespace Kenjiefx\ScratchPHP\App\Build;
 use Kenjiefx\ScratchPHP\App\Configuration\AppSettings;
+use Kenjiefx\ScratchPHP\App\Events\EventDispatcher;
+use Kenjiefx\ScratchPHP\App\Events\OnBuildCompleteEvent;
 use Kenjiefx\ScratchPHP\App\Export\ExportService;
 use Kenjiefx\ScratchPHP\App\Pages\PageController;
 use Kenjiefx\ScratchPHP\App\Pages\PageRegistry;
@@ -67,6 +69,11 @@ class BuildService
         $ExportService = new ExportService($PageController);
         $ExportService->pageHtml();
         $ExportService->pageAssets();
+    }
+
+    public function completeBuild(){
+        $EventDispatcher = new EventDispatcher;
+        $EventDispatcher->dispatchEvent(OnBuildCompleteEvent::class,ROOT.AppSettings::getExportDirPath());
     }
 
 }

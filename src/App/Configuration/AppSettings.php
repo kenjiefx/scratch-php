@@ -46,6 +46,7 @@ class AppSettings
 
             if (isset(static::$configuration['extensions'])) {
                 static::$ExtensionConfiguration = new ExtensionConfiguration();
+                
                 static::$ExtensionConfiguration::mountExtensions(static::$configuration['extensions']);
             }
 
