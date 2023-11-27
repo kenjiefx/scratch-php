@@ -31,13 +31,15 @@ class ExportService
         
         if (!is_dir($pageDir)) {
             mkdir($pageDir);
-            $pageDir = $pageDir.'/';
         }
+
+        if (substr($pageDir, -1)!=='/') $pageDir = $pageDir.'/';
 
         $fileExt  = (AppSettings::build()->exportPageWithoutHTMLExtension() === true) ? '' : '.html';
         $filePath = $pageDir.$this->PageController->getPageName().$fileExt;
 
         file_put_contents($filePath,$this->PageController->getPageHtml());
+        
     }
 
     public function pageAssets(){
