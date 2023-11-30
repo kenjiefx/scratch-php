@@ -1,6 +1,7 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Pages;
+use Kenjiefx\ScratchPHP\App\Exceptions\PageNotFoundException;
 
 /** 
  * Registers and manages the pages of your static website. 
@@ -14,7 +15,7 @@ class PageRegistry
      * Each JSON file corresponds to a specific page and contains essential information 
      * such as the page title and additional data required during the build process.
      */
-    private const PAGES_DIR = '/pages';
+    public const PAGES_DIR = '/pages';
 
     /** An list of paths to page.json files found in the PAGES_DIR */
     private array $registry = [];
@@ -37,6 +38,13 @@ class PageRegistry
                 array_push($this->registry,$filePath);
             }
         }
+    }
+
+    public function register(string $filePath){
+        if (!file_exists($filePath)) {
+            throw new PageNotFoundException($filePath);
+        }
+        array_push($this->registry,$filePath);
     }
 
     public function getPages(): PageIterator{

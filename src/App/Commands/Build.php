@@ -21,7 +21,8 @@ class Build extends Command
     {
         $BuildService = ContainerFactory::create()->get(BuildService::class);
         $BuildService->buildPage(null,[
-            'buildMode' => $input->getOption('buildMode') ?? 'default'
+            'buildMode' => $input->getOption('buildMode') ?? 'default',
+            'pagePath' => $input->getOption('page') ?? null
         ]);
         $BuildService->completeBuild();
         return Command::SUCCESS;
@@ -30,7 +31,8 @@ class Build extends Command
     protected function configure(): void
     {
         $this->setHelp('This command allows you build your app.')
-             ->addOption('buildMode',null,InputOption::VALUE_OPTIONAL,'Create component without modification from your extensions?');
+             ->addOption('buildMode',null,InputOption::VALUE_OPTIONAL,'Create component without modification from your extensions?')
+             ->addOption('page',null,InputOption::VALUE_OPTIONAL,'Create component without modification from your extensions?');
     }
 
 
