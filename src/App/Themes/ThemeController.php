@@ -74,6 +74,11 @@ class ThemeController
         return static::$ThemeModel->getDirPath();
     }
 
+    /** Returns the directory path of the theme templates */
+    public function getTemplatesDir(){
+        return $this->getThemeDirPath().'/templates';
+    }
+
     /**  Creates a theme */
     public static function create(string $name,array $options){
         $path = ROOT.self::THEME_LIB_PATH.$name;

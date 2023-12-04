@@ -29,12 +29,22 @@ class BuildService
     public function buildPage (PageController|null $PageController = null,array $options){
 
         if ($PageController===null) {
+
             $this->ThemeController->mount(AppSettings::getThemeName());
-            $this->PageRegistry->discover();
+
+            $pagePath = $options['pagePath'];
+            if ($pagePath!==null) {
+                $pagePath = ROOT.PageRegistry::PAGES_DIR.'/'.$pagePath;
+                $this->PageRegistry->register($pagePath);
+            } else {
+                $this->PageRegistry->discover();
+            }
+
             foreach ($this->PageRegistry->getPages() as $key => $PageController) {
                 $PageController->addPageData('buildMode',$options['buildMode']);
                 $this->buildPage($PageController,$options);
             }
+
             return;
         }
 

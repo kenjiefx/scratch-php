@@ -25,6 +25,12 @@ class TemplateController
         return $ThemeController->getTemplateFilePath($this->TemplateModel->getName());
     }
 
+    public function getTemplatesDir(){
+        $ThemeController = new ThemeController();
+        $ThemeController->mount(AppSettings::getThemeName());
+        return $ThemeController->getTemplatesDir();
+    }
+
     public function getUtilizedComponents():ComponentsIterator{
         $ComponentModels = [];
         foreach ($this->TemplateModel->getComponents() as $Registry) {
@@ -52,7 +58,7 @@ class TemplateController
             throw new TemplateAlreadyExistsException($this->getTemplateName());
         }
 
-        $templateContents = $this->EventDispatcher->dispatchEvent(OnCreateTemplateEvent::class,'');
+        $templateContents = $this->EventDispatcher->dispatchEvent(OnCreateTemplateEvent::class,$this);
         file_put_contents($templatePath,$templateContents ?? '');
 
     }

@@ -30,7 +30,7 @@ class ExportService
         $pageDir = $this->relativeToRealPath($this->PageController->getPageRelPath());
         
         if (!is_dir($pageDir)) {
-            mkdir($pageDir);
+            mkdir($pageDir,0755,true);
         }
 
         if (substr($pageDir, -1)!=='/') $pageDir = $pageDir.'/';
@@ -50,7 +50,7 @@ class ExportService
         $relPageDir    = $this->PageController->getPageRelPath();
         $pageAssetsDir = ($relPageDir==='') ? $assetsDir.'/' : $assetsDir.$relPageDir.'/';
 
-        if (!is_dir($pageAssetsDir)) mkdir($pageAssetsDir);
+        if (!is_dir($pageAssetsDir)) mkdir($pageAssetsDir,0755,true);
 
         $assetFileName = (AppSettings::build()->useRandomAssetsFileNames()) 
             ? $this->PageController->getPageId() : $this->PageController->getPageName();
