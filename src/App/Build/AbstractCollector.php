@@ -23,6 +23,7 @@ abstract class AbstractCollector
                 $collectedAsset .= file_get_contents($path);
             }
         }
+        $collectedAsset .= $this->templateAssets($TemplateController);
         return $this->globalSrc().$collectedAsset;
     }
 
@@ -38,5 +39,14 @@ abstract class AbstractCollector
             }
         }
         return $this->collectedAsset;
+    }
+
+    private function templateAssets(TemplateController $TemplateController){
+        $templateName      = $TemplateController->getTemplateName();
+        $templateAssetPath = $TemplateController->getTemplatesDir().'/template.'.$templateName.'.'.$this->fileType;
+        if (file_exists($templateAssetPath)) {
+            return file_get_contents($templateAssetPath);
+        }
+        return '';
     }
 }

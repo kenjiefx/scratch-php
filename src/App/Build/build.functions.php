@@ -66,7 +66,7 @@ function template_content(){
  * function also registers the component into the Template Model.
  * @param string $name - The name of the component to render
  */
-function component(string $name){
+function component(string $name, array $data = []){
 
     $ComponentController = new ComponentController(ComponentFactory::create($name));
 
@@ -77,6 +77,7 @@ function component(string $name){
     
     $PageController = BuildHelpers::PageController();
     $PageController->getTemplate()->registerComponent($ComponentController->getComponent());
+    $component = $data;
     include $ComponentController->getHtmlPath();
 }
 

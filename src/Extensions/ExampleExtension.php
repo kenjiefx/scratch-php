@@ -7,10 +7,12 @@ use Kenjiefx\ScratchPHP\App\Events\OnBuildCompleteEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildHtmlEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildJsEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateComponentHtmlEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnCreateTemplateEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateThemeEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnDeployEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnSettingsRegistryEvent;
 use Kenjiefx\ScratchPHP\App\Interfaces\ExtensionsInterface;
+use Kenjiefx\ScratchPHP\App\Templates\TemplateController;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
 class ExampleExtension implements ExtensionsInterface
@@ -56,5 +58,12 @@ class ExampleExtension implements ExtensionsInterface
     #[ListensTo(OnDeployEvent::class)]
     public function deployApp(){
         echo 'App is deployed!';
+    }
+
+    #[ListensTo(OnCreateTemplateEvent::class)]
+    public function doSomethingWhenTemplateIsCreated(TemplateController $TemplateController){
+        $templateName = $TemplateController->getTemplateName();
+        $javascriptPath = $TemplateController->getTemplatesDir().'/template.'.$templateName.'.js';
+        file_put_contents($javascriptPath,'');
     }
 }
