@@ -8,6 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kenjiefx\ScratchPHP\App\Export\ExportService;
 
 #[AsCommand(name: 'build')]
 class Build extends Command
@@ -20,6 +21,10 @@ class Build extends Command
         ): int
     {
         $BuildService = ContainerFactory::create()->get(BuildService::class);
+        $page = $input->getOption('page') ?? null;
+        if ($page===null) {
+            ExportService::clearExportDir(ExportService::getExportDirPath());
+        }
         $BuildService->buildPage(null,[
             'buildMode' => $input->getOption('buildMode') ?? 'default',
             'pagePath' => $input->getOption('page') ?? null

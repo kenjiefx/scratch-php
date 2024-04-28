@@ -23,7 +23,6 @@ class BuildService
     ){
         include __dir__.'/build.functions.php';
         AppSettings::load();
-        ExportService::clearExportDir(ExportService::getExportDirPath());
     }
 
     public function buildPage (PageController|null $PageController = null,array $options){

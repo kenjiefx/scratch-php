@@ -46,7 +46,7 @@ class ThemeController
     
     /** Returns the file path of a certain template in the theme. */
     public function getTemplateFilePath(string $name){
-        return $this->getThemeDirPath().'/templates/template.'.$name.'.php';
+        return $this->getThemeDirPath().'/templates/'.$name.'.php';
     }
 
     /** Returns the directory where Theme components are stored. */
