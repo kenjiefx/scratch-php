@@ -43,7 +43,7 @@ abstract class AbstractCollector
 
     private function templateAssets(TemplateController $TemplateController){
         $templateName      = $TemplateController->getTemplateName();
-        $templateAssetPath = $TemplateController->getTemplatesDir().'/template.'.$templateName.'.'.$this->fileType;
+        $templateAssetPath = $TemplateController->getTemplatesDir().'/'.$templateName.'.'.$this->fileType;
         if (file_exists($templateAssetPath)) {
             return file_get_contents($templateAssetPath);
         }
