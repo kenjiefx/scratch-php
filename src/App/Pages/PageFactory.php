@@ -15,13 +15,14 @@ class PageFactory
     private static int $pageIdIncrementor = 1;
 
     public static function create(PageJSON $PageJSON):PageModel{
+        $PageJSON->unpack();
         $PageModel = new PageModel(
-            pageId: strval(Self::$pageIdIncrementor++).uniqid(),
-            pageName: $PageJSON->getFileName(),
-            TemplateModel: TemplateFactory::create($PageJSON->getTemplateName()),
-            dirPath: $PageJSON->getRelPath(),
-            pageTitle: $PageJSON->getPageTitle(),
-            pageData: $PageJSON->getPageData()
+            id: strval(Self::$pageIdIncrementor++).uniqid(),
+            name: $PageJSON->filename,
+            TemplateModel: TemplateFactory::create($PageJSON->template),
+            dir: $PageJSON->reldir,
+            title: $PageJSON->title,
+            data: new PageData($PageJSON->data)
         );
         return $PageModel;
     }

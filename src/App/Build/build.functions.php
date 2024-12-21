@@ -13,9 +13,9 @@ use Kenjiefx\ScratchPHP\App\Templates\TemplateRegistry;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
 
-function page_title(){
+function page_title() {
     $PageController = BuildHelpers::PageController();
-    echo $PageController->getPageTitle();
+    echo $PageController->PageModel->title;
 }
 
 /**
@@ -23,8 +23,8 @@ function page_title(){
  */
 function template_assets(){
     $PageController = BuildHelpers::PageController();
-    $pageRelPath    = $PageController->getPageRelPath();
-    $pageAssetsName = $PageController->getAssetsName();
+    $pageRelPath    = $PageController->relpath();
+    $pageAssetsName = $PageController->assetref();
     
     $assetsRelDir = '/assets'.$pageRelPath.'/'.$pageAssetsName;
 
@@ -34,7 +34,7 @@ function template_assets(){
 
 
 function get_assets_name(){
-    return (BuildHelpers::PageController())->getAssetsName();
+    return (BuildHelpers::PageController())->assetref();
 }
 
 
@@ -43,11 +43,11 @@ function get_assets_name(){
  */
 function template_content(){
     $PageController = BuildHelpers::PageController();
-    $templateFilePath = $PageController->getTemplate()->getFilePath();
+    $templateFilePath = $PageController->template()->getFilePath();
     if (!file_exists($templateFilePath)) {
         throw new TemplateNotFoundException(
-            $PageController->getTemplate()->getTemplateName(),
-            $PageController->getTemplate()->getFilePath()
+            $PageController->template()->getTemplateName(),
+            $PageController->template()->getFilePath()
         );
     }
     include $templateFilePath; 
@@ -68,7 +68,7 @@ function component(string $name, array $data = []){
     }
     
     $PageController = BuildHelpers::PageController();
-    $PageController->getTemplate()->registerComponent($ComponentController->getComponent());
+    $PageController->template()->registerComponent($ComponentController->getComponent());
     $component = $data;
     include $ComponentController->getHtmlPath();
 }
@@ -94,6 +94,5 @@ function snippet(string $snippetName, array $data = []){
  */
 function page_data(string $field){
     $PageController = BuildHelpers::PageController();
-    $data = $PageController->getPageData();
-    return (isset($data[$field])) ? $data[$field] : null;
+    return $PageController->PageModel->data->get($field);
 }

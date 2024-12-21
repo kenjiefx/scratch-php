@@ -33,14 +33,15 @@ class BuildService
 
             $pagePath = $options['pagePath'];
             if ($pagePath!==null) {
-                $pagePath = ROOT.PageRegistry::PAGES_DIR.'/'.$pagePath;
-                $this->PageRegistry->register($pagePath);
+                $this->PageRegistry->register(
+                    ROOT.PageRegistry::PAGES_DIR . '/' . $pagePath
+                );
             } else {
                 $this->PageRegistry->discover();
             }
 
-            foreach ($this->PageRegistry->getPages() as $key => $PageController) {
-                $PageController->addPageData('buildMode',$options['buildMode']);
+            foreach ($this->PageRegistry->get() as $key => $PageController) {
+                $PageController->PageModel->data->set('buildMode',$options['buildMode']);
                 $this->buildPage($PageController,$options);
             }
 
@@ -54,6 +55,28 @@ class BuildService
         $this->exportPage($PageController);
     }
 
+    /**
+     * Starts the build process! 
+     * @param array $options
+     * @return void
+     */
+    public function start(array $options){
+        $this->ThemeController->mount(
+            AppSettings::getThemeName()
+        );
+        if ($options['pagePath'] !== null) {
+            $this->PageRegistry->register(
+                ROOT . PageRegistry::PAGES_DIR . '/' . $options['pagePath']
+            );
+        } else {
+            $this->PageRegistry->discover();
+        }
+        foreach ($this->PageRegistry->get() as $key => $PageController) {
+            $PageController->PageModel->data->set('buildMode',$options['buildMode']);
+            $this->buildPage($PageController,$options);
+        }
+    }
+
     private function bufferOutput():string{
         ob_start();
         include $this->ThemeController->getIndexFilePath();
@@ -64,13 +87,13 @@ class BuildService
 
     private function collectCss(){
         return $this->CSSCollector->collect(
-            BuildHelpers::PageController()->getTemplate()
+            BuildHelpers::PageController()->template()
         );
     }
 
     private function collectJs(){
         return $this->JSCollector->collect(
-            BuildHelpers::PageController()->getTemplate()
+            BuildHelpers::PageController()->template()
         );
     }
 
