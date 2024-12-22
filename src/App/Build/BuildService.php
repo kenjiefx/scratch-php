@@ -30,30 +30,10 @@ class BuildService
         AppSettings::load();
     }
 
-    public function buildPage (PageController|null $PageController = null,array $options){
-
-        if ($PageController===null) {
-
-            $this->ThemeController->mount(AppSettings::getThemeName());
-
-            $pagePath = $options['pagePath'];
-            if ($pagePath!==null) {
-                $this->PageRegistry->register(
-                    ROOT.PageRegistry::PAGES_DIR . '/' . $pagePath
-                );
-            } else {
-                $this->PageRegistry->discover();
-            }
-
-            foreach ($this->PageRegistry->get() as $key => $PageController) {
-                $PageController->PageModel->data->set('buildMode',$options['buildMode']);
-                $this->buildPage($PageController,$options);
-            }
-
-            return;
-        }
+    private function buildPage (PageController|null $PageController = null){
 
         BuildHelpers::PageController($PageController);
+
         $ExportableHTML = $this->buildHtml($PageController);
         $ExportableCSS = $this->buildCss($PageController);
         $ExportableJS = $this->buildJs($PageController);
@@ -126,8 +106,7 @@ class BuildService
         foreach ($this->PageRegistry->get() as $key => $PageController) {
             $PageController->PageModel->data->set('buildMode',$options['buildMode']);
             $this->buildPage(
-                $PageController,
-                $options
+                $PageController
             );
         }
     }

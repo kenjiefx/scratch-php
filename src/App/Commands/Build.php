@@ -25,7 +25,7 @@ class Build extends Command
         if ($page===null) {
             ExportService::clearExportDir(ExportService::getdir());
         }
-        $BuildService->buildPage(null,[
+        $BuildService->start([
             'buildMode' => $input->getOption('buildMode') ?? 'default',
             'pagePath' => $input->getOption('page') ?? null
         ]);
