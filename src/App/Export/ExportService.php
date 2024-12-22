@@ -8,7 +8,7 @@ class ExportService
 {
 
     public function __construct(
-        private PageController $PageController
+        private ExportObject $ExportObject
     ){
 
     }
@@ -26,51 +26,76 @@ class ExportService
         }
     }
 
-    public function pageHtml(){
-        $pageDir = $this->relativeToRealPath($this->PageController->relpath());
+    public function html(){
+
+        $pagedir = $this->toRealPath(
+            $this->ExportObject->PageController->relpath()
+        );
         
-        if (!is_dir($pageDir)) {
-            mkdir($pageDir,0755,true);
+        # Creates page director if not existing
+        if (!is_dir($pagedir)) {
+            mkdir($pagedir,0755,true);
         }
 
-        if (substr($pageDir, -1)!=='/') $pageDir = $pageDir.'/';
-        $fileExt  = (AppSettings::build()->exportPageWithoutHTMLExtension() === true) ? '' : '.html';
-        $filePath = $pageDir.$this->PageController->PageModel->name.$fileExt;
+        # Adds trailer slash to directory path if not existing
+        if (substr($pagedir, -1) !== '/') 
+            $pagedir = $pagedir . '/';
+        
+        $extension = (AppSettings::build()->exportPageWithoutHTMLExtension() === true) ? '' : '.html';
+        $filename = $this->ExportObject->PageController->PageModel->name;
+        $filepath = $pagedir.$filename.$extension;
 
-        file_put_contents($filePath,$this->PageController->getPageHtml());
+        # Finally, we export the content to the designated path
+        file_put_contents(
+            $filepath,
+            $this->ExportObject->get()
+        );
         
     }
 
-    public function pageAssets(){
+    public function css(){
+        $this->assets('.css');
+    }
 
-        $assetsDir = ExportService::getExportDirPath().'assets';
-        if (!is_dir($assetsDir)) mkdir($assetsDir);
+    public function js(){
+        $this->assets('.js');
+    }
 
-        $relPageDir    = $this->PageController->relpath();
-        $pageAssetsDir = ($relPageDir==='') ? $assetsDir.'/' : $assetsDir.$relPageDir.'/';
-
-        if (!is_dir($pageAssetsDir)) mkdir($pageAssetsDir,0755,true);
-
-        $assetFileName = (AppSettings::build()->useRandomAssetsFileNames()) 
-            ? $this->PageController->PageModel->id : $this->PageController->PageModel->name;
+    private function assets(string $extension): void {
+        $assetsdir = $this->getassdir();
         
-        $cssExportPath = $pageAssetsDir.$assetFileName.'.css';
-        file_put_contents($cssExportPath,$this->PageController->getPageCss());
+        # Creates the asset directory if not existing
+        if (!is_dir($assetsdir)) {
+            mkdir($assetsdir,0755,true);
+        }
 
-        $jsExportPath = $pageAssetsDir.$assetFileName.'.js';
-        file_put_contents($jsExportPath,$this->PageController->getPageJs());
+        $filename = $this->ExportObject->PageController->assetref();
+
+        file_put_contents(
+            $assetsdir . $filename . $extension,
+            $this->ExportObject->get()
+        );
 
     }
 
-    public static function getExportDirPath(){
+    public static function getdir(){
         return ROOT.AppSettings::getExportDirPath().'/';
     }
 
-    private function relativeToRealPath(string $relPath){
-        if ($relPath!=='') {
-            $relPath = ltrim($relPath,$relPath[0]);
+    public function getassdir(): string {
+        $dir = ExportService::getdir() . 'assets';
+        if (!is_dir($dir)) mkdir($dir);
+        $pagedir = $this->ExportObject->PageController->relpath();
+        return ($pagedir === '')  ?
+            $dir . '/' : 
+            $dir . $pagedir . '/';
+    }
+
+    private function toRealPath(string $relpath){
+        if ($relpath !== '') {
+            $relpath = ltrim($relpath,$relpath[0]);
         }
-        return ExportService::getExportDirPath().$relPath;
+        return ExportService::getdir().$relpath;
     }
 
 

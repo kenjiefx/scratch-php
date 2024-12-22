@@ -4,6 +4,10 @@ namespace Kenjiefx\ScratchPHP\App\Build;
 use Kenjiefx\ScratchPHP\App\Configuration\AppSettings;
 use Kenjiefx\ScratchPHP\App\Events\EventDispatcher;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildCompleteEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnBuildCssEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnBuildHtmlEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnBuildJsEvent;
+use Kenjiefx\ScratchPHP\App\Export\ExportObject;
 use Kenjiefx\ScratchPHP\App\Export\ExportService;
 use Kenjiefx\ScratchPHP\App\Pages\PageController;
 use Kenjiefx\ScratchPHP\App\Pages\PageRegistry;
@@ -19,7 +23,8 @@ class BuildService
         private ThemeController $ThemeController,
         private PageRegistry $PageRegistry,
         private CSSCollector $CSSCollector,
-        private JSCollector $JSCollector
+        private JSCollector $JSCollector,
+        private EventDispatcher $EventDispatcher
     ){
         include __dir__.'/build.functions.php';
         AppSettings::load();
@@ -49,10 +54,57 @@ class BuildService
         }
 
         BuildHelpers::PageController($PageController);
-        $PageController->setPageHtml($this->bufferOutput());
-        $PageController->setPageCss($this->collectCss());
-        $PageController->setPageJs($this->collectJs());
-        $this->exportPage($PageController);
+        $ExportableHTML = $this->buildHtml($PageController);
+        $ExportableCSS = $this->buildCss($PageController);
+        $ExportableJS = $this->buildJs($PageController);
+
+        (new ExportService($ExportableHTML))->html();
+        (new ExportService($ExportableCSS))->css();
+        (new ExportService($ExportableJS))->js();
+
+    }
+
+    private function buildHtml(PageController $PageController): ExportObject{
+        $Exportable = new ExportObject($PageController);
+        $EventDTO = new BuildEventDTO($PageController);
+        ob_start();
+        include $this->ThemeController->getIndexFilePath();
+        $EventDTO->content = ob_get_contents();
+        ob_end_clean();
+        $this->EventDispatcher->dispatchEvent(
+            OnBuildHtmlEvent::class,
+            $EventDTO
+        );
+        $Exportable->set($EventDTO->content);
+        return $Exportable;
+    }
+
+    private function buildCss(PageController $PageController): ExportObject {
+        $Exportable = new ExportObject($PageController);
+        $EventDTO = new BuildEventDTO($PageController);
+        $EventDTO->content = $this->CSSCollector->collect(
+            BuildHelpers::PageController()->template()
+        );
+        $this->EventDispatcher->dispatchEvent(
+            OnBuildCssEvent::class,
+            $EventDTO
+        );
+        $Exportable->set($EventDTO->content);
+        return $Exportable;
+    }
+
+    public function buildJs(PageController $PageController): ExportObject {
+        $Exportable = new ExportObject($PageController);
+        $EventDTO = new BuildEventDTO($PageController);
+        $EventDTO->content = $this->JSCollector->collect(
+            BuildHelpers::PageController()->template()
+        );
+        $this->EventDispatcher->dispatchEvent(
+            OnBuildJsEvent::class,
+            $EventDTO
+        );
+        $Exportable->set($EventDTO->content);
+        return $Exportable;
     }
 
     /**
@@ -73,35 +125,13 @@ class BuildService
         }
         foreach ($this->PageRegistry->get() as $key => $PageController) {
             $PageController->PageModel->data->set('buildMode',$options['buildMode']);
-            $this->buildPage($PageController,$options);
+            $this->buildPage(
+                $PageController,
+                $options
+            );
         }
     }
 
-    private function bufferOutput():string{
-        ob_start();
-        include $this->ThemeController->getIndexFilePath();
-        $output = ob_get_contents();
-        ob_end_clean();
-        return $output;
-    }
-
-    private function collectCss(){
-        return $this->CSSCollector->collect(
-            BuildHelpers::PageController()->template()
-        );
-    }
-
-    private function collectJs(){
-        return $this->JSCollector->collect(
-            BuildHelpers::PageController()->template()
-        );
-    }
-
-    private function exportPage(PageController $PageController){
-        $ExportService = new ExportService($PageController);
-        $ExportService->pageHtml();
-        $ExportService->pageAssets();
-    }
 
     public function completeBuild(){
         $EventDispatcher = new EventDispatcher;

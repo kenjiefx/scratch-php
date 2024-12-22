@@ -23,7 +23,7 @@ class Build extends Command
         $BuildService = ContainerFactory::create()->get(BuildService::class);
         $page = $input->getOption('page') ?? null;
         if ($page===null) {
-            ExportService::clearExportDir(ExportService::getExportDirPath());
+            ExportService::clearExportDir(ExportService::getdir());
         }
         $BuildService->buildPage(null,[
             'buildMode' => $input->getOption('buildMode') ?? 'default',
