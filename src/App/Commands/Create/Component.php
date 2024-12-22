@@ -27,7 +27,7 @@ class Component extends Command
         AppSettings::load();
         $componentName = $input->getArgument('component_name');
         $ComponentController = new ComponentController(new ComponentModel($componentName));
-        $ComponentController->createComponent([
+        $ComponentController->create([
             'applyExtensions' => !$input->getOption('clean'),
             'useTypeScript' => AppSettings::createConfig()->useComponentTypeScript()
         ]);

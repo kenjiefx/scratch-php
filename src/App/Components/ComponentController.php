@@ -15,59 +15,78 @@ class ComponentController
     private ThemeController $ThemeController;
 
     public function __construct(
-        private ComponentModel $ComponentModel
+        public readonly ComponentModel $ComponentModel
     ){
         $this->ThemeController = ContainerFactory::create()->get(ThemeController::class);
     }
 
-    public function setComponent(ComponentModel $ComponentModel){
-        $this->ComponentModel = $ComponentModel;
+    public function getdir(): string {
+        return $this->ThemeController->path()->components 
+            . $this->ComponentModel->name 
+            . '/';
     }
 
-    public function getComponent():ComponentModel {
-        return $this->ComponentModel;
+    public function paths(): ComponentPaths {
+        return new ComponentPaths(
+            $this->getdir(),
+            $this->ComponentModel->name
+        );
     }
 
-    public function getDirPath(){
-        return $this->ThemeController->getComponentsDirPath($this->ComponentModel->getName());
-    }
-
-    public function getHtmlPath(){
-        return $this->getDirPath().'/'.$this->ComponentModel->getName().'.php';
-    }
-
-    public function createComponent (array $options){
+    public function create(array $options){
 
         $this->ThemeController->mount(AppSettings::getThemeName());
-        $dirPath = $this->getDirPath();
+        $dirPath = $this->getdir();
 
         if (is_dir($dirPath)) {
             throw new ComponentAlreadyExistsException($dirPath);
         }
 
-        $jsFileType = ($options['useTypeScript']) ? '.ts' : '.js';
-
-        $htmlPath = $dirPath.'/'.$this->ComponentModel->getName().'.php';
-        $jsPath   = $dirPath.'/'.$this->ComponentModel->getName().$jsFileType;
-        $cssPath  = $dirPath.'/'.$this->ComponentModel->getName().'.css';
-
-        $this->ComponentModel->setHtml('');
-        $this->ComponentModel->setCss('');
-        $this->ComponentModel->setJavascript('');
+        $ComponentHtmlDTO = new ComponentEventDTO($this);
+        $ComponentCssDTO  = new ComponentEventDTO($this);
+        $ComponentJsDTO   = new ComponentEventDTO($this);
 
         if ($options['applyExtensions']) {
             $EventDispatcher = new EventDispatcher;
-            $html = $EventDispatcher->dispatchEvent(OnCreateComponentHtmlEvent::class,$this);
-            $css  = $EventDispatcher->dispatchEvent(OnCreateComponentCssEvent::class,$this);
-            $js   = $EventDispatcher->dispatchEvent(OnCreateComponentJsEvent::class,$this);
+            $EventDispatcher->dispatchEvent(
+                OnCreateComponentHtmlEvent::class,
+                $ComponentHtmlDTO
+            );
+            $EventDispatcher->dispatchEvent(
+                OnCreateComponentCssEvent::class,
+                $ComponentCssDTO
+            );
+            $EventDispatcher->dispatchEvent(
+                OnCreateComponentJsEvent::class,
+                $ComponentJsDTO
+            );
         }
-        
-
+    
         mkdir($dirPath);
 
-        file_put_contents($htmlPath,$this->ComponentModel->getHtml());
-        file_put_contents($cssPath,$this->ComponentModel->getCss());
-        file_put_contents($jsPath,$this->ComponentModel->getJavascript());
+        file_put_contents(
+            $this->paths()->html(),
+            $ComponentHtmlDTO->content
+        );
+
+        file_put_contents(
+            $this->paths()->css(),
+            $ComponentCssDTO->content
+        );
+
+        $usets = $options['useTypeScript'] ?? false;
+
+        if ($usets) {
+            file_put_contents(
+                $this->paths()->ts(),
+                $ComponentJsDTO->content
+            );
+        } else {
+            file_put_contents(
+                $this->paths()->js(),
+                $ComponentJsDTO->content
+            );
+        }
 
     }
 }

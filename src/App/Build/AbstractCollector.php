@@ -1,6 +1,8 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Build;
+use Kenjiefx\ScratchPHP\App\Components\ComponentController;
+use Kenjiefx\ScratchPHP\App\Components\ComponentModel;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateController;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
@@ -17,22 +19,27 @@ abstract class AbstractCollector
     }
 
     public function collect(TemplateController $TemplateController){
-        $collectedAsset = '';
-        foreach ($TemplateController->getUtilizedComponents() as $key => $ComponentModel) {
-            $name = $ComponentModel->getName();
-            $path = $this->ThemeController->getComponentsDirPath($name).'/'.$name.'.'.$this->filetype;
+        $content = '';
+        $ComponentsIterator = $TemplateController->ComponentRegistry->get();
+        foreach ($ComponentsIterator as $ComponentModel) {
+            $ComponentController 
+                = new ComponentController(
+                    $ComponentModel
+                );
+            $filetype = $this->filetype;
+            $path = $ComponentController->getdir()->$filetype();
             if (file_exists($path)) {
                 $collectedAsset .= file_get_contents($path);
             }
         }
-        $collectedAsset .= $this->templateAssets($TemplateController);
-        return $this->globalSrc().$collectedAsset;
+        $content .= $this->templateAssets($TemplateController);
+        return $this->globalSrc() . $content;
     }
 
     public function globalSrc() {
         if (null===$this->collectedAsset) {
             $this->collectedAsset = '';
-            $assetsDirPath = $this->ThemeController->getAssetsDirPath();
+            $assetsDirPath = $this->ThemeController->path()->assets;
             foreach(scandir($assetsDirPath) as $fileName) {
                 if ($fileName==='.'||$fileName==='..') continue;
                 if (explode('.',$fileName)[1]!==$this->filetype) continue; 
@@ -44,10 +51,10 @@ abstract class AbstractCollector
     }
 
     private function templateAssets(TemplateController $TemplateController){
-        $templateName      = $TemplateController->getTemplateName();
-        $templateAssetPath = $TemplateController->getTemplatesDir().'/'.$templateName.'.'.$this->filetype;
-        if (file_exists($templateAssetPath)) {
-            return file_get_contents($templateAssetPath);
+        $name = $TemplateController->TemplateModel->name;
+        $path = $TemplateController->getdir() . '/' . $name . '.' . $this->filetype;
+        if (file_exists($path)) {
+            return file_get_contents($path);
         }
         return '';
     }

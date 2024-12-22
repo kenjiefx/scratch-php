@@ -48,7 +48,7 @@ class BuildService
         $Exportable = new ExportObject($PageController);
         $EventDTO = new BuildEventDTO($PageController);
         ob_start();
-        include $this->ThemeController->getIndexFilePath();
+        include $this->ThemeController->path()->index;
         $EventDTO->content = ob_get_contents();
         ob_end_clean();
         $this->EventDispatcher->dispatchEvent(

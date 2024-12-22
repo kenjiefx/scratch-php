@@ -43,11 +43,11 @@ function get_assets_name(){
  */
 function template_content(){
     $PageController = BuildHelpers::PageController();
-    $templateFilePath = $PageController->template()->getFilePath();
+    $templateFilePath = $PageController->template()->getpath();
     if (!file_exists($templateFilePath)) {
         throw new TemplateNotFoundException(
-            $PageController->template()->getTemplateName(),
-            $PageController->template()->getFilePath()
+            $PageController->template()->TemplateModel->name,
+            $PageController->template()->getpath()
         );
     }
     include $templateFilePath; 
@@ -60,17 +60,24 @@ function template_content(){
  */
 function component(string $name, array $data = []){
 
-    $ComponentController = new ComponentController(ComponentFactory::create($name));
+    $ComponentController = new ComponentController(
+        ComponentFactory::create($name)
+    );
 
     # Validates whether the component exists in your theme
-    if (!file_exists($ComponentController->getHtmlPath())) {
-        throw new ComponentNotFoundException($name,$ComponentController->getHtmlPath());
+    if (!file_exists($ComponentController->paths()->html())) {
+        throw new ComponentNotFoundException(
+            $name,
+            $ComponentController->paths()->html()
+        );
     }
     
     $PageController = BuildHelpers::PageController();
-    $PageController->template()->registerComponent($ComponentController->getComponent());
+    $PageController->template()->ComponentRegistry->register(
+        $ComponentController->ComponentModel
+    );
     $component = $data;
-    include $ComponentController->getHtmlPath();
+    include $ComponentController->paths()->html();
 }
 
 /**
@@ -80,7 +87,7 @@ function component(string $name, array $data = []){
  */
 function snippet(string $snippetName, array $data = []){
     $ThemeController = ContainerFactory::create()->get(ThemeController::class);
-    $snippetFilePath = $ThemeController->getSnippetFilePath($snippetName);
+    $snippetFilePath = $ThemeController->path()->snippets . $snippetName . '.php';
     if (!file_exists($snippetFilePath)) {
         throw new SnippetNotFoundException($snippetName, $snippetFilePath);
     }
