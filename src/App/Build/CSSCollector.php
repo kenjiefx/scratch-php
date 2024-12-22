@@ -6,6 +6,6 @@ use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
 class CSSCollector extends AbstractCollector
 {
-    protected string $fileType = 'css';
+    protected string $filetype = 'css';
 
 }

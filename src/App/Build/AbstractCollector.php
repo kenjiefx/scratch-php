@@ -8,6 +8,8 @@ abstract class AbstractCollector
 {
     protected ?string $collectedAsset = null;
 
+    protected string $filetype;
+
     public function __construct(
         protected ThemeController $ThemeController
     ){
@@ -18,7 +20,7 @@ abstract class AbstractCollector
         $collectedAsset = '';
         foreach ($TemplateController->getUtilizedComponents() as $key => $ComponentModel) {
             $name = $ComponentModel->getName();
-            $path = $this->ThemeController->getComponentsDirPath($name).'/'.$name.'.'.$this->fileType;
+            $path = $this->ThemeController->getComponentsDirPath($name).'/'.$name.'.'.$this->filetype;
             if (file_exists($path)) {
                 $collectedAsset .= file_get_contents($path);
             }
@@ -33,7 +35,7 @@ abstract class AbstractCollector
             $assetsDirPath = $this->ThemeController->getAssetsDirPath();
             foreach(scandir($assetsDirPath) as $fileName) {
                 if ($fileName==='.'||$fileName==='..') continue;
-                if (explode('.',$fileName)[1]!==$this->fileType) continue; 
+                if (explode('.',$fileName)[1]!==$this->filetype) continue; 
                 $assetsPath            = $assetsDirPath.'/'.$fileName;
                 $this->collectedAsset .= file_get_contents($assetsPath);
             }
@@ -43,7 +45,7 @@ abstract class AbstractCollector
 
     private function templateAssets(TemplateController $TemplateController){
         $templateName      = $TemplateController->getTemplateName();
-        $templateAssetPath = $TemplateController->getTemplatesDir().'/'.$templateName.'.'.$this->fileType;
+        $templateAssetPath = $TemplateController->getTemplatesDir().'/'.$templateName.'.'.$this->filetype;
         if (file_exists($templateAssetPath)) {
             return file_get_contents($templateAssetPath);
         }
