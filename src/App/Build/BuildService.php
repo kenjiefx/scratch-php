@@ -101,6 +101,11 @@ class BuildService
                 ROOT . PageRegistry::PAGES_DIR . '/' . $options['pagePath']
             );
         } else {
+            /** 
+             * By not providing a specific page, the build step will
+             * include cleaning up the entire export directory contents.
+             */
+            ExportService::clearExportDir(ExportService::getdir());
             $this->PageRegistry->discover();
         }
         foreach ($this->PageRegistry->get() as $key => $PageController) {
