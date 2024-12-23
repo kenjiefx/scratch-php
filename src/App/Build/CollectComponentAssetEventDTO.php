@@ -4,7 +4,7 @@ namespace Kenjiefx\ScratchPHP\App\Build;
 
 use Kenjiefx\ScratchPHP\App\Components\ComponentController;
 
-class CollectEventDTO {
+class CollectComponentAssetEventDTO {
     public string $content;
 
     public function __construct(

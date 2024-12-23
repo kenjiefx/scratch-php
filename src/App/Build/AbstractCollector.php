@@ -29,10 +29,14 @@ abstract class AbstractCollector
         $content = '';
         $ComponentsIterator = $TemplateController->ComponentRegistry->get();
         foreach ($ComponentsIterator as $ComponentController) {
+            $CollectEventDTO = new CollectComponentAssetEventDTO($ComponentController);
             $filetype = $this->filetype;
             $path = $ComponentController->paths()->$filetype();
-            $CollectEventDTO = new CollectEventDTO($ComponentController);
-            $CollectEventDTO->content = file_get_contents($path);
+            if (file_exists($path)) {
+                $CollectEventDTO->content = file_get_contents($path);
+            } else {
+                $CollectEventDTO->content = '';
+            }
             if ($filetype === 'js') {
                 $this->EventDispatcher->dispatchEvent(
                     OnCollectComponentJsEvent::class, 
@@ -44,9 +48,7 @@ abstract class AbstractCollector
                     $CollectEventDTO
                 );
             }
-            if (file_exists($path)) {
-                $content .= $CollectEventDTO->content;
-            }
+            $content .= $CollectEventDTO->content;
         }
         $content .= $this->templateAssets($TemplateController);
         return $this->globalSrc() . $content;
