@@ -26,6 +26,10 @@ class ExtensionConfiguration
             if (!$ReflectionObject->implementsInterface(ExtensionsInterface::class)) {
                 throw new MustImplementExtensionInterfaceException($extensionNamespace);
             }
+
+            foreach ($ReflectionObject->getAttributes() as $ReflectionAttribute){
+                $Attribute = $ReflectionAttribute->newInstance();
+            }
             
             foreach ($ReflectionObject->getMethods() as $ReflectionMethod) {
                 foreach ($ReflectionMethod->getAttributes() as $ReflectionAttribute) {

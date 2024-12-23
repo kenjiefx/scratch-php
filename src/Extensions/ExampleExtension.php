@@ -5,6 +5,7 @@ use Kenjiefx\ScratchPHP\App\Build\BuildEventDTO;
 use Kenjiefx\ScratchPHP\App\Build\CollectComponentAssetEventDTO;
 use Kenjiefx\ScratchPHP\App\Components\ComponentController;
 use Kenjiefx\ScratchPHP\App\Components\ComponentEventDTO;
+use Kenjiefx\ScratchPHP\App\Configuration\CommandsRegistry;
 use Kenjiefx\ScratchPHP\App\Events\ListensTo;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildCompleteEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildHtmlEvent;
@@ -15,10 +16,12 @@ use Kenjiefx\ScratchPHP\App\Events\OnCreateTemplateEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateThemeEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnDeployEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnSettingsRegistryEvent;
+use Kenjiefx\ScratchPHP\App\Extensions\RegisterCommand;
 use Kenjiefx\ScratchPHP\App\Interfaces\ExtensionsInterface;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateController;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
+#[RegisterCommand(CommandExtension::class)]
 class ExampleExtension implements ExtensionsInterface
 {
 
