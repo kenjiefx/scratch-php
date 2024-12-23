@@ -27,9 +27,14 @@ class ComponentController
     }
 
     public function paths(): ComponentPaths {
+        $name = $this->ComponentModel->name;
+        if (str_contains($name, '/')){
+            $tokens = explode('/', $name);
+            $name = $tokens[count($tokens) - 1];
+        }
         return new ComponentPaths(
             $this->getdir(),
-            $this->ComponentModel->name
+            $name
         );
     }
 
@@ -62,7 +67,7 @@ class ComponentController
             );
         }
     
-        mkdir($dirPath);
+        mkdir($dirPath, 0755, true);
 
         file_put_contents(
             $this->paths()->html(),
