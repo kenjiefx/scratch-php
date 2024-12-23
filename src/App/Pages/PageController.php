@@ -11,16 +11,18 @@ use Kenjiefx\ScratchPHP\App\Templates\TemplateController;
 class PageController 
 {
 
+    private TemplateController $TemplateController;
+
     public function __construct(
         public readonly PageModel $PageModel
     ){
-
+        $this->TemplateController = new TemplateController(
+            $this->PageModel->TemplateModel
+        );
     }
 
     public function template(): TemplateController {
-        return new TemplateController(
-            $this->PageModel->TemplateModel
-        );
+        return $this->TemplateController;
     }
 
     public function relpath(): string {

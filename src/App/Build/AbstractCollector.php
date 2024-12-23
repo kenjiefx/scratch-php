@@ -3,6 +3,9 @@
 namespace Kenjiefx\ScratchPHP\App\Build;
 use Kenjiefx\ScratchPHP\App\Components\ComponentController;
 use Kenjiefx\ScratchPHP\App\Components\ComponentModel;
+use Kenjiefx\ScratchPHP\App\Events\EventDispatcher;
+use Kenjiefx\ScratchPHP\App\Events\OnCollectComponentCssEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnCollectComponentJsEvent;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateController;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
@@ -12,24 +15,35 @@ abstract class AbstractCollector
 
     protected string $filetype;
 
+    private EventDispatcher $EventDispatcher;
+
     public function __construct(
         protected ThemeController $ThemeController
     ){
-
+        $this->EventDispatcher = new EventDispatcher;
     }
 
     public function collect(TemplateController $TemplateController){
         $content = '';
         $ComponentsIterator = $TemplateController->ComponentRegistry->get();
-        foreach ($ComponentsIterator as $ComponentModel) {
-            $ComponentController 
-                = new ComponentController(
-                    $ComponentModel
-                );
+        foreach ($ComponentsIterator as $ComponentController) {
             $filetype = $this->filetype;
-            $path = $ComponentController->getdir()->$filetype();
+            $path = $ComponentController->paths()->$filetype();
+            $CollectEventDTO = new CollectEventDTO($ComponentController);
+            $CollectEventDTO->content = file_get_contents($path);
+            if ($filetype === 'js') {
+                $this->EventDispatcher->dispatchEvent(
+                    OnCollectComponentJsEvent::class, 
+                    $CollectEventDTO
+                );
+            } else {
+                $this->EventDispatcher->dispatchEvent(
+                    OnCollectComponentCssEvent::class, 
+                    $CollectEventDTO
+                );
+            }
             if (file_exists($path)) {
-                $collectedAsset .= file_get_contents($path);
+                $content .= $CollectEventDTO->content;
             }
         }
         $content .= $this->templateAssets($TemplateController);

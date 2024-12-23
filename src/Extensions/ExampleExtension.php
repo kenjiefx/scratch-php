@@ -2,12 +2,14 @@
 
 namespace Kenjiefx\ScratchPHP\Extensions;
 use Kenjiefx\ScratchPHP\App\Build\BuildEventDTO;
+use Kenjiefx\ScratchPHP\App\Build\CollectEventDTO;
 use Kenjiefx\ScratchPHP\App\Components\ComponentController;
 use Kenjiefx\ScratchPHP\App\Components\ComponentEventDTO;
 use Kenjiefx\ScratchPHP\App\Events\ListensTo;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildCompleteEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildHtmlEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildJsEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnCollectComponentJsEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateComponentHtmlEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateTemplateEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateThemeEvent;
@@ -70,5 +72,11 @@ class ExampleExtension implements ExtensionsInterface
         $name = $TemplateController->TemplateModel->name;
         $jspath = $TemplateController->getdir() . $name . '.js';
         //file_put_contents($jspath, '');
+    }
+
+    #[ListensTo(OnCollectComponentJsEvent::class)]
+    public function componentJSCollectionListener(CollectEventDTO $CollectEventDTO){
+        $componentName = $CollectEventDTO->ComponentController->ComponentModel->name;
+        $CollectEventDTO->content .= ' console.log("This is updated upon componentJsCollect for component '.$componentName.'"); ';
     }
 }
