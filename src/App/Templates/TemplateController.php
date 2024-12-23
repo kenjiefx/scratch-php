@@ -47,8 +47,17 @@ class TemplateController
             throw new TemplateAlreadyExistsException($this->TemplateModel->name);
         }
 
-        $contents = $this->EventDispatcher->dispatchEvent(OnCreateTemplateEvent::class,$this);
-        file_put_contents($templatepath,$contents ?? '');
+        $TemplateEventDTO = new TemplateEventDTO($this);
+        $TemplateEventDTO->content = '';
+
+        $this->EventDispatcher->dispatchEvent(
+            OnCreateTemplateEvent::class,
+            $TemplateEventDTO
+        );
+        file_put_contents(
+            $templatepath,
+            $TemplateEventDTO->content
+        );
 
     }
 
