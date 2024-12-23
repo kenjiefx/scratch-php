@@ -24,7 +24,7 @@ class Template extends Command
         AppSettings::load();
         $templateName = $input->getArgument('template_name');
         $TemplateController = new TemplateController(new TemplateModel($templateName));
-        $TemplateController->createTemplate();
+        $TemplateController->create();
         return Command::SUCCESS;
     }
 

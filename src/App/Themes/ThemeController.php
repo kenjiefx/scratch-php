@@ -29,6 +29,8 @@ class ThemeController
      */
     private const THEME_LIB_PATH = '/theme/';
 
+    private static ThemePaths $paths;
+
     /**
      * This function decides the theme that would be used throughout the build
      * process. While this method can be called multiple times, it will only
@@ -36,47 +38,32 @@ class ThemeController
      */
     public function mount(string $name){
         if (!isset(static::$ThemeModel)) {
-            $path = ROOT.self::THEME_LIB_PATH.$name;
+            $path = ROOT . self::THEME_LIB_PATH. $name;
             if (!is_dir($path)) {
                 new ThemeNotFoundException($name,$path);
             }
             static::$ThemeModel = new ThemeModel($name,$path);
+            static::$paths = new ThemePaths(
+                components: $path . '/components/',
+                templates: $path . '/templates/',
+                snippets: $path . '/snippets/',
+                assets: $path . '/assets/',
+                index: $path . '/index.php',
+            );
         }
     }
-    
-    /** Returns the file path of a certain template in the theme. */
-    public function getTemplateFilePath(string $name){
-        return $this->getThemeDirPath().'/templates/'.$name.'.php';
+
+    public function path(){
+        return static::$paths;
     }
 
-    /** Returns the directory where Theme components are stored. */
-    public function getComponentsDirPath(string $name){
-        return $this->getThemeDirPath().'/components/'.$name;
-    }
-
-    /** Returns the file path fo the theme's index file. */
-    public function getIndexFilePath(){
-        return $this->getThemeDirPath().'/index.php';
-    }
-
-    /** Returns the directory where the Theme snippets are stored.*/
-    public function getSnippetFilePath (string $name){
-        return $this->getThemeDirPath().'/snippets/'.$name.'.php';
-    }
-
-    /** Returns the directory where Theme asset files are stored */
-    public function getAssetsDirPath(){
-        return $this->getThemeDirPath().'/assets';
+    public function theme(){
+        return static::$ThemeModel;
     }
 
     /** Returns the directory path of the mounted theme. */
-    public function getThemeDirPath(){
-        return static::$ThemeModel->getDirPath();
-    }
-
-    /** Returns the directory path of the theme templates */
-    public function getTemplatesDir(){
-        return $this->getThemeDirPath().'/templates';
+    public function getdir():string {
+        return static::$ThemeModel->dirpath;
     }
 
     /**  Creates a theme */

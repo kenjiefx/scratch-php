@@ -4,35 +4,31 @@ namespace Kenjiefx\ScratchPHP\App\Pages;
 
 class PageIterator implements \Iterator
 {
-    private $paths;
+    private $PageControllers;
     private $position;
 
-    public function __construct(array $paths) {
-        $this->paths = $paths;
+    public function __construct(array $PageControllers) {
+        $this->PageControllers = $PageControllers;
         $this->position = 0;
     }
 
     public function current(): PageController {
-        $PageJSON = new PageJSON();
-        $PageJSON->unpackFromSrc($this->paths[$this->position]);
-        $PageModel = PageFactory::create($PageJSON);
-        $PageController = new PageController($PageModel);
-        return $PageController;
+        return $this->PageControllers[$this->position];
     }
 
-    public function key() {
+    public function key(): mixed {
         return $this->position;
     }
 
-    public function next() {
+    public function next(): void {
         $this->position++;
     }
 
-    public function rewind() {
+    public function rewind(): void {
         $this->position = 0;
     }
 
-    public function valid() {
-        return isset($this->paths[$this->position]);
+    public function valid(): bool {
+        return isset($this->PageControllers[$this->position]);
     }
 }

@@ -1,28 +1,37 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\Extensions;
+use Kenjiefx\ScratchPHP\App\Build\BuildEventDTO;
+use Kenjiefx\ScratchPHP\App\Build\CollectComponentAssetEventDTO;
 use Kenjiefx\ScratchPHP\App\Components\ComponentController;
+use Kenjiefx\ScratchPHP\App\Components\ComponentEventDTO;
+use Kenjiefx\ScratchPHP\App\Configuration\CommandsRegistry;
 use Kenjiefx\ScratchPHP\App\Events\ListensTo;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildCompleteEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildHtmlEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnBuildJsEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnCollectComponentJsEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateComponentHtmlEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateTemplateEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCreateThemeEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnDeployEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnSettingsRegistryEvent;
+use Kenjiefx\ScratchPHP\App\Extensions\RegisterCommand;
 use Kenjiefx\ScratchPHP\App\Interfaces\ExtensionsInterface;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateController;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
+#[RegisterCommand(CommandExtension::class)]
 class ExampleExtension implements ExtensionsInterface
 {
 
     private array $extensionSettings = [];
 
     #[ListensTo(OnBuildHtmlEvent::class)]
-    public function processHtml(string $html){
-        return $html;
+    public function processHtml(BuildEventDTO $BuildEventDTO){
+        $BuildEventDTO->content 
+            = $BuildEventDTO->content 
+            . ' Hello this is added from ExampleExtension ';
     }
 
     #[ListensTo(OnSettingsRegistryEvent::class)]
@@ -31,20 +40,21 @@ class ExampleExtension implements ExtensionsInterface
     }
 
     #[ListensTo(OnBuildJsEvent::class)]
-    public function processJavascript(string $js){
-        return $js.'console.log("hello world!")';
+    public function processJavascript(BuildEventDTO $BuildEventDTO){
+        $BuildEventDTO->content 
+            = $BuildEventDTO->content 
+            . ' console.log("hello world from Example Extension!") ';
     }
 
     #[ListensTo(OnCreateComponentHtmlEvent::class)]
-    public function appendNewComponentHtml(ComponentController $ComponentController){
-        $html = $ComponentController->getComponent()->getHtml();
-        $ComponentController->getComponent()->setHtml($html.'Hello world');
-        return null;
+    public function appendNewComponentHtml(ComponentEventDTO $ComponentEventDTO){
+        $htmlpath = $ComponentEventDTO->ComponentController->paths()->html();
+        $ComponentEventDTO->content = 'Hello world, from: '.$htmlpath;
     }
 
     #[ListensTo(OnCreateThemeEvent::class)]
     public function doSomethingAfterThemeIsCreated(ThemeController $ThemeController){
-        $testSnippet = $ThemeController->getThemeDirPath().'/snippets/test.snippet.php';
+        $testSnippet = $ThemeController->getdir().'/snippets/test.snippet.php';
         file_put_contents($testSnippet,'Hello, this is created using extension!');
     }
 
@@ -62,8 +72,14 @@ class ExampleExtension implements ExtensionsInterface
 
     #[ListensTo(OnCreateTemplateEvent::class)]
     public function doSomethingWhenTemplateIsCreated(TemplateController $TemplateController){
-        $templateName = $TemplateController->getTemplateName();
-        $javascriptPath = $TemplateController->getTemplatesDir().'/template.'.$templateName.'.js';
-        file_put_contents($javascriptPath,'');
+        $name = $TemplateController->TemplateModel->name;
+        $jspath = $TemplateController->getdir() . $name . '.js';
+        //file_put_contents($jspath, '');
+    }
+
+    #[ListensTo(OnCollectComponentJsEvent::class)]
+    public function componentJSCollectionListener(CollectComponentAssetEventDTO $CollectComponentAssetEventDTO){
+        $componentName = $CollectComponentAssetEventDTO->ComponentController->ComponentModel->name;
+        $CollectComponentAssetEventDTO->content .= ' console.log("This is updated upon componentJsCollect for component '.$componentName.'"); ';
     }
 }

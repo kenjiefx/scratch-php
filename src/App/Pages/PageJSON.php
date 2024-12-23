@@ -10,65 +10,89 @@ use Kenjiefx\ScratchPHP\App\Exceptions\MissingPageJsonFieldException;
  */
 class PageJSON
 {
-    private string $templateName;
-    private string $pageTitle;
-    private array $pageData;
-    private string $fileName;
-    private string $relPath;
+    /**
+     * Name of the page template
+     * @var string
+     */
+    public readonly string $template;
 
-    public function __construct(){
+    /**
+     * Title given to the page
+     * @var string
+     */
+    public readonly string $title;
+
+    /**
+     * Custom configurations
+     * @var array
+     */
+    public readonly array $data;
+
+    /**
+     * Name of the Page JSON file 
+     * @var string
+     */
+    public readonly string $filename;
+
+    /**
+     * Relative director where Page JSON 
+     * file exists
+     * @var string
+     */
+    public readonly string $reldir;
+
+    public function __construct(
+        private string $path
+    ){
 
     }
 
     /**
-     * Parses and validates Page JSON file.
+     * Extracts, validates, and transforms data 
+     * stored in Page JSON file
      */
-    public function unpackFromSrc(string $path){
+    public function unpack(){
 
-        $data = json_decode(file_get_contents($path),TRUE);
+        $configuration = 
+            json_decode(
+                json: file_get_contents(filename: $this->path),
+                associative: TRUE
+            );
 
-        if (!isset($data['template'])) throw new MissingPageJsonFieldException('template',$path);
-        $this->templateName = $data['template'];
+        if (!isset($configuration['template'])) {
+            throw new MissingPageJsonFieldException(
+                missing_field: 'template',
+                template_path: $this->path
+            );
+        }
 
-        if (!isset($data['title'])) throw new MissingPageJsonFieldException('title',$path);
-        $this->pageTitle = $data['title'];
+        if (!isset($configuration['title'])) {
+            throw new MissingPageJsonFieldException(
+                missing_field: 'title',
+                template_path: $this->path
+            );
+        }
 
-        if (isset($data['data'])) $this->pageData = $data['data'];
+        $this->template = $configuration['template'];
+        $this->title = $configuration['title'];
+        $this->data = $configuration['data'] ?? [];
 
-        $this->deriveMetadataFromPath($path);
+        $this->filename 
+            = pathinfo(
+                path: $this->path, 
+                flags: PATHINFO_FILENAME
+            );
+        $reldir = str_replace(
+            search: ROOT . PageRegistry::PAGES_DIR,
+            replace: '', 
+            subject: dirname($this->path)
+        );
+        if (isset($reldir[0]) && $reldir[0] === '/') {
+            $reldir = substr($reldir, 1);
+        }
 
-        return $this;
+        $this->reldir = $reldir;
+
     }
-
-    private function deriveMetadataFromPath (string $path){
-        $pathTokens  = explode('/',$path);
-        $fileNamePos = count($pathTokens) - 1;
-        [$this->fileName,] = explode('.',$pathTokens[$fileNamePos]);
-        array_shift($pathTokens);
-        array_shift($pathTokens);
-        array_pop($pathTokens);
-        $this->relPath = implode('/',$pathTokens);
-    }
-
-    public function getTemplateName(){
-        return $this->templateName;
-    }
-
-    public function getPageTitle(){
-        return $this->pageTitle;
-    }
-
-    public function getPageData(){
-        return $this->pageData ?? [];
-    }
-
-    public function getFileName(){
-        return $this->fileName;
-    }
-
-    public function getRelPath(){
-        return $this->relPath;
-    }
-
 
 }

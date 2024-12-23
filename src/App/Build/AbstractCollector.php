@@ -1,6 +1,13 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Build;
+use Kenjiefx\ScratchPHP\App\Components\ComponentController;
+use Kenjiefx\ScratchPHP\App\Components\ComponentModel;
+use Kenjiefx\ScratchPHP\App\Events\EventDispatcher;
+use Kenjiefx\ScratchPHP\App\Events\OnCollectComponentCssEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnCollectComponentJsEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnCollectTemplateCssEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnCollectTemplateJsEvent;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateController;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
@@ -8,32 +15,52 @@ abstract class AbstractCollector
 {
     protected ?string $collectedAsset = null;
 
+    protected string $filetype;
+
+    private EventDispatcher $EventDispatcher;
+
     public function __construct(
         protected ThemeController $ThemeController
     ){
-
+        $this->EventDispatcher = new EventDispatcher;
     }
 
     public function collect(TemplateController $TemplateController){
-        $collectedAsset = '';
-        foreach ($TemplateController->getUtilizedComponents() as $key => $ComponentModel) {
-            $name = $ComponentModel->getName();
-            $path = $this->ThemeController->getComponentsDirPath($name).'/'.$name.'.'.$this->fileType;
+        $content = '';
+        $ComponentsIterator = $TemplateController->ComponentRegistry->get();
+        foreach ($ComponentsIterator as $ComponentController) {
+            $CollectEventDTO = new CollectComponentAssetEventDTO($ComponentController);
+            $filetype = $this->filetype;
+            $path = $ComponentController->paths()->$filetype();
             if (file_exists($path)) {
-                $collectedAsset .= file_get_contents($path);
+                $CollectEventDTO->content = file_get_contents($path);
+            } else {
+                $CollectEventDTO->content = '';
             }
+            if ($filetype === 'js') {
+                $this->EventDispatcher->dispatchEvent(
+                    OnCollectComponentJsEvent::class, 
+                    $CollectEventDTO
+                );
+            } else {
+                $this->EventDispatcher->dispatchEvent(
+                    OnCollectComponentCssEvent::class, 
+                    $CollectEventDTO
+                );
+            }
+            $content .= $CollectEventDTO->content;
         }
-        $collectedAsset .= $this->templateAssets($TemplateController);
-        return $this->globalSrc().$collectedAsset;
+        $content .= $this->templateAssets($TemplateController);
+        return $this->globalSrc() . $content;
     }
 
     public function globalSrc() {
         if (null===$this->collectedAsset) {
             $this->collectedAsset = '';
-            $assetsDirPath = $this->ThemeController->getAssetsDirPath();
+            $assetsDirPath = $this->ThemeController->path()->assets;
             foreach(scandir($assetsDirPath) as $fileName) {
                 if ($fileName==='.'||$fileName==='..') continue;
-                if (explode('.',$fileName)[1]!==$this->fileType) continue; 
+                if (explode('.',$fileName)[1]!==$this->filetype) continue; 
                 $assetsPath            = $assetsDirPath.'/'.$fileName;
                 $this->collectedAsset .= file_get_contents($assetsPath);
             }
@@ -42,11 +69,30 @@ abstract class AbstractCollector
     }
 
     private function templateAssets(TemplateController $TemplateController){
-        $templateName      = $TemplateController->getTemplateName();
-        $templateAssetPath = $TemplateController->getTemplatesDir().'/'.$templateName.'.'.$this->fileType;
-        if (file_exists($templateAssetPath)) {
-            return file_get_contents($templateAssetPath);
+        $name = $TemplateController->TemplateModel->name;
+        $filetype = $this->filetype;
+        $CollectTemplateAssetEventDTO 
+            = new CollectTemplateAssetEventDTO(
+                $TemplateController
+            );
+        $path = $TemplateController->getdir() . '/' . $name . '.' . $filetype;
+        if (file_exists($path)) {
+            $CollectTemplateAssetEventDTO->content 
+                = file_get_contents($path);
+        } else {
+            $CollectTemplateAssetEventDTO->content = '';
         }
-        return '';
+        if ($filetype === 'js') {
+            $this->EventDispatcher->dispatchEvent(
+                OnCollectTemplateJsEvent::class, 
+                $CollectTemplateAssetEventDTO
+            );
+        } else {
+            $this->EventDispatcher->dispatchEvent(
+                OnCollectTemplateCssEvent::class, 
+                $CollectTemplateAssetEventDTO
+            );
+        }
+        return $CollectTemplateAssetEventDTO->content;
     }
 }

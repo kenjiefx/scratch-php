@@ -10,19 +10,11 @@ namespace Kenjiefx\ScratchPHP\App\Themes;
 class ThemeModel
 {
     public function __construct(
-        private string $name,
-        private string $libPath
+        public readonly string $name,
+        public readonly string $dirpath
     ){
         
     }
 
-    /** Returns the path of the theme in the library */
-    public function getDirPath():string {
-        return $this->libPath;
-    }
-
-    /** Returns the name of the theme */
-    public function getName():string {
-        return $this->name;
-    }
+    
 }

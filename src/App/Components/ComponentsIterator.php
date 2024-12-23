@@ -4,31 +4,31 @@ namespace Kenjiefx\ScratchPHP\App\Components;
 
 class ComponentsIterator implements \Iterator
 {
-    private $ComponentModels;
+    private $ComponentControllers;
     private $position;
 
-    public function __construct(array $ComponentModels) {
-        $this->ComponentModels = $ComponentModels;
+    public function __construct(array $ComponentControllers) {
+        $this->ComponentControllers = $ComponentControllers;
         $this->position = 0;
     }
 
-    public function current():ComponentModel {
-        return $this->ComponentModels[$this->position];
+    public function current(): ComponentController {
+        return $this->ComponentControllers[$this->position];
     }
 
-    public function key() {
+    public function key(): int {
         return $this->position;
     }
 
-    public function next() {
+    public function next(): void {
         $this->position++;
     }
 
-    public function rewind() {
+    public function rewind(): void {
         $this->position = 0;
     }
 
-    public function valid() {
-        return isset($this->ComponentModels[$this->position]);
+    public function valid(): bool {
+        return isset($this->ComponentControllers[$this->position]);
     }
 }

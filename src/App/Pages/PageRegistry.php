@@ -24,30 +24,53 @@ class PageRegistry
         
     }
 
-    /** Recursively crawls through the ROOT.'/pages' directory and looks for PageJSON */
-    public function discover(string|null $dirPath=null){
-        if ($dirPath===null) {
-            $dirPath = ROOT.self::PAGES_DIR;
+    /** 
+     * Recursively crawls through the ROOT.'/pages' directory and looks for PageJSON 
+     */
+    public function discover(string|null $dirpath = null) {
+
+        if ($dirpath === null) {
+            $dirpath = ROOT . self::PAGES_DIR;
         }
-        foreach (scandir($dirPath) as $fileName) {
-            if ($fileName==='.'||$fileName==='..') continue;
-            $filePath = $dirPath.'/'.$fileName;
-            if (is_dir($filePath)) { 
-                $this->discover($filePath);
+
+        $filenames = array_filter(
+            scandir(directory: $dirpath),
+            function(string $filename): bool {
+                return $filename !== '.' && $filename !== '..';
+            }
+        );
+
+        foreach ($filenames as $filename) {
+            $filepath = $dirpath . '/' . $filename;
+            if (is_dir(filename: $filepath)) { 
+                # Recursively discover pages
+                $this->discover(dirpath: $filepath);
             } else {
-                array_push($this->registry,$filePath);
+                $this->register($filepath);
             }
         }
     }
 
-    public function register(string $filePath){
-        if (!file_exists($filePath)) {
-            throw new PageNotFoundException($filePath);
+    /**
+     * Creates and registers a PageController into the registry
+     * @param string $filepath
+     * @throws \Kenjiefx\ScratchPHP\App\Exceptions\PageNotFoundException
+     * @return void
+     */
+    public function register(string $filepath) {
+        if (!file_exists($filepath)) {
+            throw new PageNotFoundException($filepath);
         }
-        array_push($this->registry,$filePath);
+        $PageController 
+            = new PageController(
+                PageFactory::create(
+                    new PageJSON($filepath)
+                )
+            );
+        array_push($this->registry,$PageController);
     }
 
-    public function getPages(): PageIterator{
+    public function get(): PageIterator {
         $PageIterator = new PageIterator($this->registry);
         return $PageIterator;
     }

@@ -21,15 +21,10 @@ class Build extends Command
         ): int
     {
         $BuildService = ContainerFactory::create()->get(BuildService::class);
-        $page = $input->getOption('page') ?? null;
-        if ($page===null) {
-            ExportService::clearExportDir(ExportService::getExportDirPath());
-        }
-        $BuildService->buildPage(null,[
+        $BuildService->start([
             'buildMode' => $input->getOption('buildMode') ?? 'default',
             'pagePath' => $input->getOption('page') ?? null
         ]);
-        $BuildService->completeBuild();
         return Command::SUCCESS;
     }
 
