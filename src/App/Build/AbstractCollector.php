@@ -6,6 +6,8 @@ use Kenjiefx\ScratchPHP\App\Components\ComponentModel;
 use Kenjiefx\ScratchPHP\App\Events\EventDispatcher;
 use Kenjiefx\ScratchPHP\App\Events\OnCollectComponentCssEvent;
 use Kenjiefx\ScratchPHP\App\Events\OnCollectComponentJsEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnCollectTemplateCssEvent;
+use Kenjiefx\ScratchPHP\App\Events\OnCollectTemplateJsEvent;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateController;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeController;
 
@@ -66,10 +68,29 @@ abstract class AbstractCollector
 
     private function templateAssets(TemplateController $TemplateController){
         $name = $TemplateController->TemplateModel->name;
-        $path = $TemplateController->getdir() . '/' . $name . '.' . $this->filetype;
+        $filetype = $this->filetype;
+        $CollectTemplateAssetEventDTO 
+            = new CollectTemplateAssetEventDTO(
+                $TemplateController
+            );
+        $path = $TemplateController->getdir() . '/' . $name . '.' . $filetype;
         if (file_exists($path)) {
-            return file_get_contents($path);
+            $CollectTemplateAssetEventDTO->content 
+                = file_get_contents($path);
+        } else {
+            $CollectTemplateAssetEventDTO->content = '';
         }
-        return '';
+        if ($filetype === 'js') {
+            $this->EventDispatcher->dispatchEvent(
+                OnCollectTemplateJsEvent::class, 
+                $CollectTemplateAssetEventDTO
+            );
+        } else {
+            $this->EventDispatcher->dispatchEvent(
+                OnCollectTemplateCssEvent::class, 
+                $CollectTemplateAssetEventDTO
+            );
+        }
+        return $CollectTemplateAssetEventDTO->content;
     }
 }
