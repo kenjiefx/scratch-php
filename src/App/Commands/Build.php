@@ -25,7 +25,6 @@ class Build extends Command
             'buildMode' => $input->getOption('buildMode') ?? 'default',
             'pagePath' => $input->getOption('page') ?? null
         ]);
-        $BuildService->completeBuild();
         return Command::SUCCESS;
     }
 

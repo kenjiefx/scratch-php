@@ -114,10 +114,11 @@ class BuildService
                 $PageController
             );
         }
+        $this->complete();
     }
 
 
-    public function completeBuild(){
+    private function complete(){
         $EventDispatcher = new EventDispatcher;
         $EventDispatcher->dispatchEvent(OnBuildCompleteEvent::class,ROOT.AppSettings::getExportDirPath());
     }
