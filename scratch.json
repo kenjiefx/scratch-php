@@ -1,0 +1,9 @@
+{
+    "theme": "welcome",
+    "exportDir": "\/dist",
+    "build": {
+        "useHashedFilenames": true
+    },
+    "create":{},
+    "extensions": {}
+}

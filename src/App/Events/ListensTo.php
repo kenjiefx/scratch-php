@@ -1,8 +1,7 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Events;
-use Kenjiefx\ScratchPHP\App\Exceptions\MustImplementEventInterfaceException;
-use Kenjiefx\ScratchPHP\App\Interfaces\EventInterface;
+use Kenjiefx\ScratchPHP\App\Events\EventInterface;
 
 #[\Attribute]
 class ListensTo
@@ -12,7 +11,7 @@ class ListensTo
     public function __construct(string $EventInterfaceClass){
         $ReflectionObject = new \ReflectionObject(new $EventInterfaceClass());
         if (!$ReflectionObject->implementsInterface(EventInterface::class)) {
-            throw new MustImplementEventInterfaceException($EventInterfaceClass);
+            throw new \Exception("Event class must implement EventInterface: $EventInterfaceClass");
         }
         $this->Event = $ReflectionObject->newInstance();
     }

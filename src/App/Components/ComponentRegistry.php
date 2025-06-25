@@ -2,29 +2,31 @@
 
 namespace Kenjiefx\ScratchPHP\App\Components;
 
-/** 
- * Registers and manages the components user within the template. 
- * This object holds an array of Component Controllers.
+/**
+ * Registers and manages the components used within the template.
+ * This object holds an array of
  */
 class ComponentRegistry {
 
-    /** An array of Component Controllers */
-    private array $registry = [];
+    /**
+     * An array of Component Models
+     */
+    private static array $registry = [];
 
-    public function __construct(){
-        
-    }
+    public function __construct(
 
-    public function register(ComponentModel $ComponentModel){
-        $ComponentCtrl = new ComponentController($ComponentModel);
-        array_push($this->registry, $ComponentCtrl);
+    ) {}
+
+    public function register(ComponentModel $componentModel){
+        array_push(self::$registry, $componentModel);
     }
 
     public function get(): ComponentsIterator {
-        $ComponentIterator = new ComponentsIterator($this->registry);
-        return $ComponentIterator;
+        return new ComponentsIterator(self::$registry);
     }
 
-
+    public function clear(){
+        self::$registry = [];
+    }
 
 }
