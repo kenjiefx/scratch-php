@@ -13,12 +13,15 @@ class ComponentCSSCollectedEvent implements EventInterface
     private string $name;
     private ComponentModel $componentModel;
     private string $content;
+    private string $componentDir;
 
     public function __construct(
         ComponentModel $componentModel, 
+        string $componentDir,
         string $content
     ) {
         $this->componentModel = $componentModel;
+        $this->componentDir = $componentDir;
         $this->content = $content;
         $this->name = ComponentCSSCollectedEvent::class;
     }
@@ -33,6 +36,10 @@ class ComponentCSSCollectedEvent implements EventInterface
 
     public function getContent(): string {
         return $this->content;
+    }
+
+    public function getComponentDir(): string {
+        return $this->componentDir;
     }
 
     public function updateContent(
