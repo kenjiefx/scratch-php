@@ -1,7 +1,7 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Events;
-use Kenjiefx\ScratchPHP\App\Interfaces\EventInterface;
+use Kenjiefx\ScratchPHP\App\Events\EventInterface;
 
 class SettingsRegisteredEvent implements EventInterface
 {

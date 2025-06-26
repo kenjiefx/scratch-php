@@ -109,4 +109,13 @@ class FileService {
         }
     }
 
+    /**
+     * Returns the path to the directory where the file is located.
+     * @param \Kenjiefx\ScratchPHP\App\Files\File $file
+     * @return string
+     */
+    public function getDir(File $file){
+        return dirname($file->path);
+    }
+
 }
