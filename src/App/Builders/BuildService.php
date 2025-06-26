@@ -4,7 +4,7 @@ namespace Kenjiefx\ScratchPHP\App\Builders;
 
 use Kenjiefx\ScratchPHP\App\Components\ComponentRegistry;
 use Kenjiefx\ScratchPHP\App\Configurations\ConfigurationInterface;
-use Kenjiefx\ScratchPHP\App\Events\{BuildCompletedEvent, CSSBuildCompletedEvent, EventDispatcher, HTMLBuildCompletedEvent, JSBuildCompletedEvent};
+use Kenjiefx\ScratchPHP\App\Events\{BuildCompletedEvent, PageBuildStartedEvent, PageBuildCompletedEvent, CSSBuildCompletedEvent, EventDispatcher, HTMLBuildCompletedEvent, JSBuildCompletedEvent};
 use Kenjiefx\ScratchPHP\App\Exports\{ExporterInterface, ExportFactory};
 use Kenjiefx\ScratchPHP\App\Pages\{PageModel, PageRegistry};
 use Kenjiefx\ScratchPHP\App\Themes\{ThemeFactory, ThemeModel};
@@ -30,11 +30,15 @@ class BuildService
         );
 
         foreach ($pageRegistry as $pageModel) {
+            $this->dispatchPageBuildStartEvent($pageModel);
             $this->componentRegistry->clear();
             $this->buildHtml($themeModel, $pageModel);
             $this->buildAsset($themeModel, $pageModel, 'css');
             $this->buildAsset($themeModel, $pageModel, 'js');
+            $this->dispatchPageBuildCompletedEvent($pageModel);
         }
+
+        $this->dispatchCompletedEvent();
     }
 
     public function buildHtml(ThemeModel $themeModel, PageModel $pageModel): void
@@ -83,6 +87,20 @@ class BuildService
         $event = new BuildCompletedEvent(
             $this->configuration->getExportDir()
         );
+        $this->eventDispatcher->dispatchEvent($event);
+    }
+
+    private function dispatchPageBuildStartEvent(
+        PageModel $pageModel
+    ){
+        $event = new PageBuildStartedEvent($pageModel);
+        $this->eventDispatcher->dispatchEvent($event);
+    }
+
+    private function dispatchPageBuildCompletedEvent(
+        PageModel $pageModel
+    ){
+        $event = new PageBuildCompletedEvent($pageModel);
         $this->eventDispatcher->dispatchEvent($event);
     }
 }
