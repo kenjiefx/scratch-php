@@ -51,7 +51,7 @@ class ScratchJsonConfiguration implements ConfigurationInterface
         return $this->rootDir;
     }
 
-    public function exportDir(): string
+    public function getExportDir(): string
     {
         return $this->exportDir;
     }

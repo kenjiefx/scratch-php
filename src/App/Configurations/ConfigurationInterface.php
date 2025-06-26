@@ -6,7 +6,7 @@ interface ConfigurationInterface {
 
     public function getRootDir(): string;
 
-    public function exportDir(): string;
+    public function getExportDir(): string;
 
     public function getThemeName(): string;
 

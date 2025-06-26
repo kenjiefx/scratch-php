@@ -4,7 +4,7 @@ namespace Kenjiefx\ScratchPHP\App\Builders;
 
 use Kenjiefx\ScratchPHP\App\Components\ComponentRegistry;
 use Kenjiefx\ScratchPHP\App\Configurations\ConfigurationInterface;
-use Kenjiefx\ScratchPHP\App\Events\{CSSBuildCompletedEvent, EventDispatcher, HTMLBuildCompletedEvent, JSBuildCompletedEvent};
+use Kenjiefx\ScratchPHP\App\Events\{BuildCompletedEvent, CSSBuildCompletedEvent, EventDispatcher, HTMLBuildCompletedEvent, JSBuildCompletedEvent};
 use Kenjiefx\ScratchPHP\App\Exports\{ExporterInterface, ExportFactory};
 use Kenjiefx\ScratchPHP\App\Pages\{PageModel, PageRegistry};
 use Kenjiefx\ScratchPHP\App\Themes\{ThemeFactory, ThemeModel};
@@ -76,5 +76,13 @@ class BuildService
         $updatedContent = $event->getContent();
         $exportModel = $exportFactory($updatedContent);
         $this->exporter->export($exportModel);
+    }
+
+    private function dispatchCompletedEvent(): void
+    {
+        $event = new BuildCompletedEvent(
+            $this->configuration->getExportDir()
+        );
+        $this->eventDispatcher->dispatchEvent($event);
     }
 }
