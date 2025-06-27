@@ -71,7 +71,7 @@ class HTMLBuildService {
                 return $blockRegistry;
             }
         );
-        include __DIR__ . '/theme.apis.php';
+        include_once __DIR__ . '/theme.apis.php';
         include $this->themeService->getThemeIndexPath($themeModel)->path;
         $content = ob_get_contents();
         ob_end_clean();

@@ -115,8 +115,8 @@ class HTTPRunner implements RunnerInterface
             $response->getBody()->write($html);
             return $response->withHeader('Content-Type', 'text/html')->withStatus(200);
         });
-        $this->applicationRunner->get('/assets/{assetName}', function (Request $request, Response $response, array $args) {
-            $assetName = $args['assetName'];
+        $this->applicationRunner->get('/assets/{path:.*}', function (Request $request, Response $response, array $args) {
+            $assetName = $args['path'];
             Container::get()->add(
                 TemplateServiceInterface::class,
                 new TemplateService(

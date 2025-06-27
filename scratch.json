@@ -2,7 +2,7 @@
     "theme": "welcome",
     "exportDir": "\/dist",
     "build": {
-        "useHashedFilenames": true
+        "useHashedFilenames": false
     },
     "create":{},
     "extensions": {}

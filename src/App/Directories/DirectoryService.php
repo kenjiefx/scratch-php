@@ -108,4 +108,8 @@ class DirectoryService {
         return true; // Return success
     }
 
+    public function isDirectory(string $path): bool {
+        return is_dir($path);
+    }
+
 }
