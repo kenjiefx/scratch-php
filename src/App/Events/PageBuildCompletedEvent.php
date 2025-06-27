@@ -5,12 +5,10 @@ namespace Kenjiefx\ScratchPHP\App\Events;
 use Kenjiefx\ScratchPHP\App\Pages\PageModel;
 
 class PageBuildCompletedEvent implements EventInterface {
-
-
     private string $name;
 
     public function __construct(
-        private PageModel $pageModel,
+        private PageModel | null $pageModel = null
     ) {
         $this->name = PageBuildCompletedEvent::class;
     }

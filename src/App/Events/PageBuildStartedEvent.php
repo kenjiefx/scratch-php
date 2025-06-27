@@ -9,7 +9,7 @@ class PageBuildStartedEvent implements EventInterface {
     private string $name;
 
     public function __construct(
-        private PageModel $pageModel
+        private PageModel | null $pageModel = null
     ) {
         $this->name = PageBuildStartedEvent::class;
     }
