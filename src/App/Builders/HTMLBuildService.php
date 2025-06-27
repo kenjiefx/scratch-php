@@ -2,6 +2,7 @@
 
 namespace Kenjiefx\ScratchPHP\App\Builders;
 
+use Kenjiefx\ScratchPHP\App\Blocks\BlockRegistry;
 use Kenjiefx\ScratchPHP\App\Pages\PageModel;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateServiceInterface;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeModel;
@@ -13,7 +14,8 @@ class HTMLBuildService {
     public function __construct(
         public readonly ThemeService $themeService,
         public readonly TemplateServiceInterface $templateService,
-        public readonly ComponentRegistry $componentRegistry
+        public readonly ComponentRegistry $componentRegistry,
+        public readonly BlockRegistry $blockRegistry
     ) {}
 
     /**
@@ -27,6 +29,7 @@ class HTMLBuildService {
     ) {
         $templateModel = $pageModel->templateModel;
         $componentRegistry = $this->componentRegistry;
+        $blockRegistry = $this->blockRegistry;
         ob_start();
         $templatePath = $this->templateService->getTemplatePath(
             $themeModel,
@@ -60,6 +63,12 @@ class HTMLBuildService {
             BuildMessage::GET_COMPONENT_REGISTRY,
             function () use ($componentRegistry) {
                 return $componentRegistry;
+            }
+        );
+        BuildMessageChannel::addListener(
+            BuildMessage::GET_BLOCK_REGISTRY,
+            function () use ($blockRegistry) {
+                return $blockRegistry;
             }
         );
         include __DIR__ . '/theme.apis.php';

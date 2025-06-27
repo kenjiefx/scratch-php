@@ -1,5 +1,7 @@
 <?php 
 
+use Kenjiefx\ScratchPHP\App\Blocks\BlockFactory;
+use Kenjiefx\ScratchPHP\App\Blocks\BlockService;
 use Kenjiefx\ScratchPHP\App\Builders\BuildMessageBoard;
 use Kenjiefx\ScratchPHP\App\Builders\BuildMessage;
 use Kenjiefx\ScratchPHP\App\Builders\BuildMessageChannel;
@@ -68,6 +70,31 @@ function component($path, array $data = []) {
     $component = $data;
     $component['id'] = $componentModel->id;
     include $componentPath->path;
+}
+
+function block($path, array $data = []) {
+    $blockService = Container::get()->get(BlockService::class);
+    $themeModel 
+        = BuildMessageChannel::post(
+            BuildMessage::GET_THEME
+        );
+    $blockModel = BlockFactory::create($path);
+    $blockPath 
+        = $blockService->getHtmlPath(
+            $blockModel,
+            $themeModel
+        );
+    $blockRegistry = BuildMessageChannel::post(
+        BuildMessage::GET_BLOCK_REGISTRY
+    );
+    /**
+     * Blocks used within the theme will be registered 
+     * in the block registry.
+     */
+    $blockRegistry->register($blockModel);
+    $block = $data;
+    $block['id'] = $blockModel->id;
+    include $blockPath->path;
 }
 
 function snippet(){

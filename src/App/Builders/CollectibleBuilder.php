@@ -2,7 +2,12 @@
 
 namespace Kenjiefx\ScratchPHP\App\Builders;
 
+use Kenjiefx\ScratchPHP\App\Blocks\BlockCollector;
+use Kenjiefx\ScratchPHP\App\Blocks\BlockRegistry;
+use Kenjiefx\ScratchPHP\App\Blocks\BlockService;
 use Kenjiefx\ScratchPHP\App\Components\ComponentService;
+use Kenjiefx\ScratchPHP\App\Events\BlockCSSCollectedEvent;
+use Kenjiefx\ScratchPHP\App\Events\BlockJSCollectedEvent;
 use Kenjiefx\ScratchPHP\App\Events\ComponentCSSCollectedEvent;
 use Kenjiefx\ScratchPHP\App\Events\ComponentJSCollectedEvent;
 use Kenjiefx\ScratchPHP\App\Events\EventDispatcher;
@@ -25,34 +30,59 @@ class CollectibleBuilder {
         public readonly ComponentRegistry $componentRegistry,
         public readonly ComponentCollector $componentCollector,
         public readonly EventDispatcher $eventDispatcher,
-        public readonly ComponentService $componentService
+        public readonly ComponentService $componentService,
+        public readonly BlockRegistry $blockRegistry,
+        public readonly BlockService $blockService,
+        public readonly BlockCollector $blockCollector
     ) {}
+
+    public function buildGlobalAssets(
+        ThemeModel $themeModel,
+        AssetsEnum $assetEnum
+    ){
+        return $this->assetCollector->collectAll($assetEnum, $themeModel);
+    }
     
-    public function build(
+    public function buildDomainAssets(
         ThemeModel $themeModel,
         AssetsEnum $assetEnum,
         string $event
     ): string {
-        $content = $this->assetCollector->collectAll($assetEnum, $themeModel);
+
+        $content = "";
 
         // Determines whether the content has already been collected for each file 
         // This is done to avoid duplicate processing of the same CSS or JS file
         // This is particularly useful when multiple components share the same file.
         $hasCollectedColletible = [];
+
+        $registry = $this->getRegistryBasedOnEvent($event);
+        $service = $this->getServiceBasedOnEvent($event);
     
-        foreach ($this->componentRegistry->get() as $componentModel) {
+        foreach ($registry->get() as $model) {
             [$createCollectibleMethod, $eventClass] = match ($event) {
                 ComponentCSSCollectedEvent::class => ['createCSSCollectible', ComponentCSSCollectedEvent::class],
                 ComponentJSCollectedEvent::class => ['createJSCollectible', ComponentJSCollectedEvent::class],
+                BlockCSSCollectedEvent::class => ['createCSSCollectible', BlockCSSCollectedEvent::class],
+                BlockJSCollectedEvent::class => ['createJSCollectible', BlockJSCollectedEvent::class],
                 default => throw new \InvalidArgumentException("Unsupported event: {$event}")
             };
 
-            $componentDir = $this->componentService->getComponentDir(
-                $componentModel, 
-                $themeModel
-            );
+            if ($service === "ComponentService") {
+                $theDir = $this->componentService->getComponentDir(
+                    $model, $themeModel
+                );
+                $collectorType = $this->componentCollector;
+            } elseif ($service === "BlockService") {
+                $theDir = $this->blockService->getBlockDir(
+                    $model, $themeModel
+                );
+                $collectorType = $this->blockCollector;
+            } else {
+                throw new \InvalidArgumentException("Unsupported service: {$service}");
+            }
     
-            $collectible = $this->componentCollector->{$createCollectibleMethod}($componentModel, $themeModel);
+            $collectible = $collectorType->{$createCollectibleMethod}($model, $themeModel);
 
             // Check if the file has already been collected
             $filePath = $collectible->file->path;
@@ -66,7 +96,11 @@ class CollectibleBuilder {
                 }
 
                 // Dispatch the event and let the event listener modify the content if needed
-                $eventObject = new $eventClass($componentModel, $componentDir, $originalContent);
+                $eventObject = new $eventClass([
+                    "model" => $model,
+                    "dir" => $theDir,
+                    "content" => $originalContent,
+                ]);
                 $this->eventDispatcher->dispatchEvent($eventObject);
 
                 // Append the content to the final output
@@ -79,6 +113,22 @@ class CollectibleBuilder {
         }
     
         return $content;
+    }
+
+    public function getRegistryBasedOnEvent(string $event): ComponentRegistry | BlockRegistry {
+        return match ($event) {
+            ComponentCSSCollectedEvent::class, ComponentJSCollectedEvent::class => $this->componentRegistry,
+            BlockCSSCollectedEvent::class, BlockJSCollectedEvent::class => $this->blockRegistry,
+            default => throw new \InvalidArgumentException("Unsupported event: {$event}")
+        };
+    }
+
+    public function getServiceBasedOnEvent(string $event): string {
+        return match ($event) {
+            ComponentCSSCollectedEvent::class, ComponentJSCollectedEvent::class => "ComponentService",
+            BlockCSSCollectedEvent::class, BlockJSCollectedEvent::class => "BlockService",
+            default => throw new \InvalidArgumentException("Unsupported event: {$event}")
+        };
     }
     
     

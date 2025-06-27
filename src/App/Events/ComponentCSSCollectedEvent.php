@@ -11,18 +11,14 @@ use Kenjiefx\ScratchPHP\App\Events\EventInterface;
 class ComponentCSSCollectedEvent implements EventInterface
 {
     private string $name;
-    private ComponentModel $componentModel;
+    private ComponentModel | null $componentModel;
     private string $content;
     private string $componentDir;
 
-    public function __construct(
-        ComponentModel $componentModel, 
-        string $componentDir,
-        string $content
-    ) {
-        $this->componentModel = $componentModel;
-        $this->componentDir = $componentDir;
-        $this->content = $content;
+    public function __construct(array $params = []) {
+        $this->componentModel = $params['model'] ?? null;
+        $this->componentDir = $params['dir'] ?? '';
+        $this->content = $params['content'] ?? '';
         $this->name = ComponentCSSCollectedEvent::class;
     }
 
