@@ -4,6 +4,9 @@ namespace Kenjiefx\ScratchPHP\App\Runner;
 
 use Directory;
 use Kenjiefx\ScratchPHP\App\CLI\BuildCommand;
+use Kenjiefx\ScratchPHP\App\CLI\CreateBlockCommand;
+use Kenjiefx\ScratchPHP\App\CLI\CreateComponentCommand;
+use Kenjiefx\ScratchPHP\App\CLI\CreateTemplateCommand;
 use Kenjiefx\ScratchPHP\App\Configurations\ConfigurationInterface;
 use Kenjiefx\ScratchPHP\App\Configurations\ScratchJsonConfiguration;
 use Kenjiefx\ScratchPHP\App\Directories\DirectoryService;
@@ -42,6 +45,9 @@ class CLIRunner implements RunnerInterface
         $this->initDistExporter();
         $this->applicationRunner = new Application();
         $this->applicationRunner->add(new BuildCommand());
+        $this->applicationRunner->add(new CreateComponentCommand());
+        $this->applicationRunner->add(new CreateBlockCommand());
+        $this->applicationRunner->add(new CreateTemplateCommand());
     }
 
     /**
