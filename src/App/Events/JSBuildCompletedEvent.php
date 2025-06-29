@@ -9,8 +9,8 @@ class JSBuildCompletedEvent implements EventInterface
     private $name;
 
     public function __construct(
-        private PageModel $pageModel,
-        private string $jsContent
+        private PageModel | null $pageModel = null,
+        private string $jsContent = ""
     ) {
         $this->name = JSBuildCompletedEvent::class;
     }

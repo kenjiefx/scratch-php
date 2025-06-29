@@ -9,8 +9,8 @@ class CSSBuildCompletedEvent implements EventInterface
     private $name;
 
     public function __construct(
-        private PageModel $pageModel,
-        private string $cssContent
+        private PageModel | null $pageModel = null,
+        private string $cssContent = ""
     ) {
         $this->name = CSSBuildCompletedEvent::class;
     }
