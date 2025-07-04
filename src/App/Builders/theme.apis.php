@@ -50,8 +50,13 @@ function template_content(){
     );
 }
 
-/** 
- * Renders a component into templates or other components.
+/**
+ * This function is used to render a component.
+ * It will include the component's HTML file and 
+ * register the component in the component registry.
+ * 
+ * @param string $path The path to the component.
+ * @param array $data The data to be passed to the component.
  */
 function component($path, array $data = []) {
     $componentService = Container::get()->get(ComponentService::class);
@@ -84,7 +89,8 @@ function component($path, array $data = []) {
     $event = new ComponentHTMLCollectedEvent([
         "model" => $componentModel,
         "dir" => $componentService->getComponentDir($componentModel, $themeModel),
-        "content" => $content
+        "content" => $content,
+        "data" => $data
     ]);
     echo $event->getContent();
 }

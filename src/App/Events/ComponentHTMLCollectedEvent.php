@@ -11,11 +11,13 @@ class ComponentHTMLCollectedEvent implements EventInterface
     private ComponentModel | null $componentModel;
     private string $content;
     private string $componentDir;
+    private array $data;
 
     public function __construct(array $params = []) {
         $this->componentModel = $params['model'] ?? null;
         $this->componentDir = $params['dir'] ?? '';
         $this->content = $params['content'] ?? '';
+        $this->data = $params['data'] ?? [];
         $this->name = ComponentHTMLCollectedEvent::class;
     }
 
@@ -39,5 +41,9 @@ class ComponentHTMLCollectedEvent implements EventInterface
         string $content
     ): void {
         $this->content = $content;
+    }
+
+    public function getData(): array {
+        return $this->data;
     }
 }
