@@ -15,13 +15,14 @@ class EditorExtension implements ExtensionsInterface
     #[ListensTo(HTMLBuildCompletedEvent::class)]
     public function removeTemplateAssetReferences(HTMLBuildCompletedEvent $event)
     {
-        // Remove template asset references from the HTML content
+        // Replace the template asset references with the editor assets.
         $htmlContent = $event->getContent();
-        $updatedHtml = preg_replace(
-            '/<!--start:template_assets-->.*?<!--end:template_assets-->/is',
-            '',
-            $htmlContent
-        );
+        $pattern = '/<!--start:template_assets-->(.*?)<!--end:template_assets-->/s';
+        $editorAssets = '<!--start:template_assets-->' .
+            '<link rel="stylesheet" href="$assets/editor.css">' .
+            '<script type="text/javascript" src="$assets/editor.js"></script>' .
+            '<!--end:template_assets-->';
+        $updatedHtml = preg_replace($pattern, $editorAssets, $htmlContent);
         $event->updateContent($updatedHtml);
     }
 }

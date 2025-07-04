@@ -5,9 +5,6 @@
     </section>
 </section>
 
-<script type="text/javascript" src="$assets/editor.js"></script>
-<link rel="stylesheet" href="$assets/editor.css">
-
 <style>
 .--editor-mainframe {
     position: fixed;
