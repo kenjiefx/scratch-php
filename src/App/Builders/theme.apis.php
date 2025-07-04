@@ -6,10 +6,16 @@ use Kenjiefx\ScratchPHP\App\Builders\BuildMessageBoard;
 use Kenjiefx\ScratchPHP\App\Builders\BuildMessage;
 use Kenjiefx\ScratchPHP\App\Builders\BuildMessageChannel;
 use Kenjiefx\ScratchPHP\App\Components\ComponentService;
+use Kenjiefx\ScratchPHP\App\Configurations\ConfigurationInterface;
+use Kenjiefx\ScratchPHP\App\Events\EventDispatcher;
 use Kenjiefx\ScratchPHP\App\Exports\ExportFactory;
+use Kenjiefx\ScratchPHP\App\Themes\ThemeFactory;
+use Kenjiefx\ScratchPHP\App\Themes\ThemeModel;
+use Kenjiefx\ScratchPHP\App\Themes\ThemeService;
 use Kenjiefx\ScratchPHP\Container;
 use Kenjiefx\ScratchPHP\App\Components\ComponentModel;
 use Kenjiefx\ScratchPHP\App\Components\ComponentFactory;
+use Kenjiefx\ScratchPHP\App\Events\ComponentHTMLCollectedEvent;
 
 function page_title() {
     $pageModel = BuildMessageChannel::post(
@@ -69,7 +75,18 @@ function component($path, array $data = []) {
     $componentRegistry->register($componentModel);
     $component = $data;
     $component['id'] = $componentModel->id;
+    ob_start();
     include $componentPath->path;
+    $content = ob_get_contents();
+    ob_end_clean();
+    $themeModel = get_theme();
+    $eventDispatcher = Container::get()->get(EventDispatcher::class);
+    $event = new ComponentHTMLCollectedEvent([
+        "model" => $componentModel,
+        "dir" => $componentService->getComponentDir($componentModel, $themeModel),
+        "content" => $content
+    ]);
+    echo $event->getContent();
 }
 
 function block($path, array $data = []) {
@@ -97,6 +114,34 @@ function block($path, array $data = []) {
     include $blockPath->path;
 }
 
-function snippet(){
-    
+function get_theme(): ThemeModel {
+    $configuration = Container::get()->get(ConfigurationInterface::class);
+    $themeFactory = Container::get()->get(ThemeFactory::class);
+    return $themeFactory->create(
+        $configuration->getThemeName()
+    );
+}
+
+function snippet(string $snippetName, array $data = []){ 
+    $configuration = Container::get()->get(ConfigurationInterface::class);
+    $themeFactory = Container::get()->get(ThemeFactory::class);
+    $themeModel = $themeFactory->create(
+        $configuration->getThemeName()
+    );
+    $themeService = Container::get()->get(ThemeService::class);
+    $themeDir = $themeService->getThemeDir($themeModel);
+    $snippetPath = "$themeDir/snippets/$snippetName.php";
+    if (!file_exists($snippetPath)) {
+        throw new \Exception("Snippet not found: $snippetName at $snippetPath");
+    }
+    $snippet = $data;
+    include $snippetPath;
+}
+
+function page_data(string $field){
+    $pageModel = BuildMessageChannel::post(
+        BuildMessage::GET_PAGE
+    );
+    $pageData = $pageModel->data;
+    return $pageData[$field] ?? null;
 }
