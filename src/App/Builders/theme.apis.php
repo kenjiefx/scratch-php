@@ -92,6 +92,7 @@ function component($path, array $data = []) {
         "content" => $content,
         "data" => $data
     ]);
+    $eventDispatcher->dispatchEvent($event);
     echo $event->getContent();
 }
 
