@@ -1,19 +1,20 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Components;
+use Kenjiefx\ScratchPHP\App\Components\ComponentModel;
 
 class ComponentsIterator implements \Iterator
 {
-    private $ComponentControllers;
+    private $models;
     private $position;
 
-    public function __construct(array $ComponentControllers) {
-        $this->ComponentControllers = $ComponentControllers;
+    public function __construct(array $models) {
+        $this->models = $models;
         $this->position = 0;
     }
 
-    public function current(): ComponentController {
-        return $this->ComponentControllers[$this->position];
+    public function current(): ComponentModel {
+        return $this->models[$this->position];
     }
 
     public function key(): int {
@@ -29,6 +30,6 @@ class ComponentsIterator implements \Iterator
     }
 
     public function valid(): bool {
-        return isset($this->ComponentControllers[$this->position]);
+        return isset($this->models[$this->position]);
     }
 }

@@ -1,0 +1,25 @@
+<?php 
+
+namespace Kenjiefx\ScratchPHP\App\Events;
+
+use Kenjiefx\ScratchPHP\App\Pages\PageModel;
+
+class PageBuildStartedEvent implements EventInterface {
+
+    private string $name;
+
+    public function __construct(
+        private PageModel | null $pageModel = null
+    ) {
+        $this->name = PageBuildStartedEvent::class;
+    }
+
+    public function getName():string {
+        return $this->name;
+    }
+
+    public function getPageModel(): PageModel {
+        return $this->pageModel;
+    }
+
+}
