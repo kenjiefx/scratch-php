@@ -39,8 +39,8 @@ function template_assets(){
     $jsExportModel = Container::get()->get(ExportFactory::class)
         ->createAsAsset($pageModel, 'js', '');
     echo '<!--start:template_assets-->' . PHP_EOL;
-    echo '<script type="text/javascript" src="/'.$jsExportModel->relativePath.'?v='.time().'"></script>'.PHP_EOL;
-    echo '<link rel="stylesheet" href="/'.$cssExportModel->relativePath.'?v='.time().'">';
+    echo '<script type="text/javascript" src="/scratch-php/'.$jsExportModel->relativePath.'?v='.time().'"></script>'.PHP_EOL;
+    echo '<link rel="stylesheet" href="/scratch-php/'.$cssExportModel->relativePath.'?v='.time().'">';
     echo '<!--end:template_assets-->' . PHP_EOL;
 }
 
