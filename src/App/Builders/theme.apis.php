@@ -38,9 +38,10 @@ function template_assets(){
         ->createAsAsset($pageModel, 'css', '');
     $jsExportModel = Container::get()->get(ExportFactory::class)
         ->createAsAsset($pageModel, 'js', '');
+    $baseUrl = base_url();
     echo '<!--start:template_assets-->' . PHP_EOL;
-    echo '<script type="text/javascript" src="/'.$jsExportModel->relativePath.'?v='.time().'"></script>'.PHP_EOL;
-    echo '<link rel="stylesheet" href="/'.$cssExportModel->relativePath.'?v='.time().'">';
+    echo '<script type="text/javascript" src="'.$baseUrl.$jsExportModel->relativePath.'?v='.time().'"></script>'.PHP_EOL;
+    echo '<link rel="stylesheet" href="'.$baseUrl.$cssExportModel->relativePath.'?v='.time().'">';
     echo '<!--end:template_assets-->' . PHP_EOL;
 }
 
@@ -151,4 +152,9 @@ function page_data(string $field){
     );
     $pageData = $pageModel->data;
     return $pageData[$field] ?? null;
+}
+
+function base_url(): string {
+    $configuration = Container::get()->get(ConfigurationInterface::class);
+    return $configuration->getBaseUrl();
 }

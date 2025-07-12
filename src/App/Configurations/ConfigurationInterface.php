@@ -16,4 +16,8 @@ interface ConfigurationInterface {
 
     public function getExtensions(): array;
 
+    public function getBaseUrl(): string;
+
+    public function setBaseUrl(string $baseUrl): void;
+
 }

@@ -7,13 +7,14 @@ namespace Kenjiefx\ScratchPHP\App\Configurations;
  */
 class ScratchJsonConfiguration implements ConfigurationInterface
 {
-    private string $rootDir;
-    private string $exportDir;
-    private string $themeName;
-    private bool $toUseHashedFilenames = false;
-    private string | null $pageToBuild = null;
+    protected string $rootDir;
+    protected string $exportDir;
+    protected string $themeName;
+    protected bool $toUseHashedFilenames = false;
+    protected string | null $pageToBuild = null;
+    protected string $baseUrl;
 
-    private array $extensions = [];
+    protected array $extensions = [];
 
     public function __construct() {
         $this->load();
@@ -38,12 +39,19 @@ class ScratchJsonConfiguration implements ConfigurationInterface
         }
         $this->themeName = $configs['theme'];
         $this->exportDir = $configs['exportDir'];
+        $this->baseUrl = $configs['baseUrl'] ?? '/';
         $buildConfigs = $configs['build'] ?? [];
         $this->toUseHashedFilenames = $buildConfigs['useHashedFilenames'] ?? false;
         $this->pageToBuild = $buildConfigs['pageToBuild'] ?? null;
         if (isset($configs['extensions']) && is_array($configs['extensions'])) {
             $this->extensions = $configs['extensions'];
         }
+    }
+
+    public function setBaseUrl(
+        string $baseUrl
+    ) : void {
+        $this->baseUrl = $baseUrl;
     }
     
     public function getRootDir(): string
@@ -74,5 +82,10 @@ class ScratchJsonConfiguration implements ConfigurationInterface
     public function getExtensions(): array
     {
         return $this->extensions;
+    }
+
+    public function getBaseUrl(): string
+    {
+        return $this->baseUrl;
     }
 }
