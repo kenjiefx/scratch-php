@@ -1,5 +1,5 @@
 {
-    "theme": "welcome",
+    "theme": "docs",
     "exportDir": "\/dist",
     "build": {
         "useHashedFilenames": false

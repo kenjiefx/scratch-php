@@ -1,6 +1,7 @@
 /vendor/
 /node_modules/
-/theme/
+/theme/*
+!/theme/docs
 /dist/*
 !/dist/README.md
 /src/App/Pages/bin/*
