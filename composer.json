@@ -1,6 +1,6 @@
 {
     "name": "kenjiefx/scratch-php",
-    "description": "A static site generator built using PHP",
+    "description": "Simple, lightweight, and endlessly extendable static site generator.",
     "type": "library",
     "license": "MIT",
     "autoload": {
