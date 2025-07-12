@@ -33,7 +33,7 @@ jobs:
         run: composer install --no-dev --optimize-autoloader
 
       - name: Build static site
-        run: php bin/scratch build
+        run: php bin/scratch build --baseUrl=https://kenjiefx.github.io/scratch-php/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
