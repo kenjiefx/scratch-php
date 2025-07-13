@@ -139,7 +139,17 @@ class HTTPRunner implements RunnerInterface
             } elseif ($extension === 'js') {
                 $response->getBody()->write($assetContent);
                 return $response->withHeader('Content-Type', 'application/javascript')->withStatus(200);
-            } else {
+            } elseif ($extension === 'ico') {
+                $response->getBody()->write($assetContent);
+                return $response->withHeader('Content-Type', 'image/x-icon')->withStatus(200);
+            } elseif (in_array($extension, ['png', 'jpg', 'jpeg', 'gif'])) {
+                $response->getBody()->write($assetContent);
+                return $response->withHeader('Content-Type', 'image/' . $extension)->withStatus(200);
+            } elseif ($extension === 'svg') {
+                $response->getBody()->write($assetContent);
+                return $response->withHeader('Content-Type', 'image/svg+xml')->withStatus(200);
+            }
+            else {
                 $response->getBody()->write('Asset not found');
                 return $response->withHeader('Content-Type', 'text/plain')->withStatus(404);
             }
