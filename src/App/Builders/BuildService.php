@@ -8,6 +8,7 @@ use Kenjiefx\ScratchPHP\App\Events\{BuildCompletedEvent, PageBuildStartedEvent, 
 use Kenjiefx\ScratchPHP\App\Exports\{ExporterInterface, ExportFactory};
 use Kenjiefx\ScratchPHP\App\Pages\{PageModel, PageRegistry};
 use Kenjiefx\ScratchPHP\App\Themes\{ThemeFactory, ThemeModel};
+use Kenjiefx\ScratchPHP\App\Statics\StaticAssetsRegistry;
 
 class BuildService
 {
@@ -20,7 +21,8 @@ class BuildService
         public readonly HTMLBuildService $htmlBuildService,
         public readonly CSSBuildService $cssBuildService,
         public readonly ExportFactory $exportFactory,
-        public readonly JSBuildService $jSBuildService
+        public readonly JSBuildService $jSBuildService,
+        public readonly StaticAssetsRegistry $staticAssetsRegistry,
     ) {}
 
     public function build(PageRegistry $pageRegistry): void
@@ -28,6 +30,8 @@ class BuildService
         $themeModel = $this->themeFactory->create(
             $this->configuration->getThemeName()
         );
+
+        $this->staticAssetsRegistry->clear();
 
         foreach ($pageRegistry as $pageModel) {
             $this->dispatchPageBuildStartEvent($pageModel);
@@ -37,6 +41,8 @@ class BuildService
             $this->buildAsset($themeModel, $pageModel, 'js');
             $this->dispatchPageBuildCompletedEvent($pageModel);
         }
+
+        $this->exportStaticAssets();
 
         $this->dispatchCompletedEvent();
     }
@@ -102,5 +108,12 @@ class BuildService
     ){
         $event = new PageBuildCompletedEvent($pageModel);
         $this->eventDispatcher->dispatchEvent($event);
+    }
+
+    private function exportStaticAssets() {
+        foreach ($this->staticAssetsRegistry->getAll() as $staticAssetModel) {
+            $exportModel = $this->exportFactory->createAsStaticAsset($staticAssetModel);
+            $this->exporter->export($exportModel);
+        }
     }
 }

@@ -16,6 +16,7 @@ use Kenjiefx\ScratchPHP\Container;
 use Kenjiefx\ScratchPHP\App\Components\ComponentModel;
 use Kenjiefx\ScratchPHP\App\Components\ComponentFactory;
 use Kenjiefx\ScratchPHP\App\Events\ComponentHTMLCollectedEvent;
+use Kenjiefx\ScratchPHP\App\Statics\StaticAssetsFactory;
 
 function page_title() {
     $pageModel = BuildMessageChannel::post(
@@ -43,6 +44,17 @@ function template_assets(){
     echo '<script type="text/javascript" src="'.$baseUrl.$jsExportModel->relativePath.'?v='.time().'"></script>'.PHP_EOL;
     echo '<link rel="stylesheet" href="'.$baseUrl.$cssExportModel->relativePath.'?v='.time().'">';
     echo '<!--end:template_assets-->' . PHP_EOL;
+}
+
+function asset(string $fileName) {
+    $staticAssetsRegistry = BuildMessageChannel::post(
+        BuildMessage::GET_STATIC_ASSETS_REGISTRY
+    );
+    $staticAssetsFactory = Container::get()->get(StaticAssetsFactory::class);
+    $staticAssetsModel = $staticAssetsFactory->create($fileName);
+    $staticAssetsRegistry->register($staticAssetsModel);
+    $baseUrl = base_url();
+    echo "{$baseUrl}assets/{$fileName}?v=" . time();
 }
 
 function template_content(){

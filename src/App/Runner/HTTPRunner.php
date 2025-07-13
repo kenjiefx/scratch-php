@@ -39,24 +39,16 @@ class HTTPRunner implements RunnerInterface
     public function loadDependencies()
     {
         Container::get()->delegate(new ReflectionContainer());
-        Container::get()->add(
-            ConfigurationInterface::class,
-            new ScratchJsonConfiguration()
-        );
+        Container::get()->add(ConfigurationInterface::class, new ScratchJsonConfiguration());
         Container::get()->get(ScratchJsonExtManager::class)->load();
         $this->applicationRunner = AppFactory::create();
+
         $this->applicationRunner->get('/$editor', function (Request $request, Response $response, array $args) {
             try {
                 $queryParams = $request->getQueryParams();
                 $component = $queryParams['component'] ?? null;
-                Container::get()->add(
-                    TemplateServiceInterface::class,
-                    new EditorTemplateService()
-                );
-                Container::get()->add(
-                    ExporterInterface::class,
-                    new EditorExportService()
-                );
+                $this->assignTemplateService(new EditorTemplateService());
+                $this->assignExporterService(new EditorExportService());
                 Container::get()->get(ScratchJsonExtManager::class)->mount([
                     EditorExtension::class => []
                 ]);
@@ -71,92 +63,56 @@ class HTTPRunner implements RunnerInterface
                 return $response->withStatus(code: 500)->withHeader('Content-Type', 'text/plain');
             }
         });
+
         $this->applicationRunner->get('/$assets/{assetName}', function (Request $request, Response $response, array $args) {
-            $assetName = $args['assetName'];
-            Container::get()->add(
-                TemplateServiceInterface::class,
-                new EditorTemplateService()
-            );
-            Container::get()->add(
-                ExporterInterface::class,
-                new EditorExportService()
-            );
+            // Assign the EditorTemplateService and EditorExportService to the container
+            $this->assignTemplateService(new EditorTemplateService());
+            $this->assignExporterService(new EditorExportService());
             $pagePreviewerController = Container::get()->get(EditorController::class);
-            $assetContent = $pagePreviewerController->retrieveAsset($assetName);
-            // check asset type based on file extension of asset name 
-            $extension = pathinfo($assetName, PATHINFO_EXTENSION);
-            if ($extension === 'css') {
+            try {
+                $assetName = $args['assetName'];
+                $assetContent = $pagePreviewerController->retrieveAsset($assetName);
+                $contentType = $this->convertFileExtToMimeType($assetName);
                 $response->getBody()->write($assetContent);
-                return $response->withHeader('Content-Type', 'text/css')->withStatus(200);
-            } elseif ($extension === 'js') {
-                $response->getBody()->write($assetContent);
-                return $response->withHeader('Content-Type', 'application/javascript')->withStatus(200);
-            } else {
-                $response->getBody()->write('Asset not found');
+                return $response->withHeader('Content-Type', $contentType)->withStatus(200);
+            } catch (\Exception $e) {
+                $response->getBody()->write('Asset not found: ' . $e->getMessage());
                 return $response->withHeader('Content-Type', 'text/plain')->withStatus(404);
             }
         });
 
         $this->applicationRunner->get('/', function (Request $request, Response $response, array $args) {
-            Container::get()->add(
-                TemplateServiceInterface::class,
-                new TemplateService(
-                    Container::get()->get(ConfigurationInterface::class),
-                    Container::get()->get(ThemeService::class),
-                    Container::get()->get(FileFactory::class),
-                )
-            );
-            Container::get()->add(
-                ExporterInterface::class,
-                new PagePreviewerExportService()
-            );
+            $templateService = $this->getDefaultTemplateService();
+            $this->assignTemplateService($templateService);
+            $this->assignExporterService(new PagePreviewerExportService());
             $pagePreviewerController = Container::get()->get(PagePreviewController::class);
             $html = $pagePreviewerController->renderHtml('index.json');
             $response->getBody()->write($html);
             return $response->withHeader('Content-Type', 'text/html')->withStatus(200);
         });
+
         $this->applicationRunner->get('/assets/{path:.*}', function (Request $request, Response $response, array $args) {
-            $assetName = $args['path'];
-            Container::get()->add(
-                TemplateServiceInterface::class,
-                new TemplateService(
-                    Container::get()->get(ConfigurationInterface::class),
-                    Container::get()->get(ThemeService::class),
-                    Container::get()->get(FileFactory::class),
-                )
-            );
-            Container::get()->add(
-                ExporterInterface::class,
-                new PagePreviewerExportService()
-            );
+            // Assign the TemplateService and ExporterService to the container
+            $templateService = $this->getDefaultTemplateService();
+            $this->assignTemplateService($templateService);
+            $this->assignExporterService(new PagePreviewerExportService());
+            // Retrieve the asset content using the PagePreviewController
             $pagePreviewerController = Container::get()->get(PagePreviewController::class);
-            $assetContent = $pagePreviewerController->retrieveAsset($assetName);
-            // check asset type based on file extension of asset name 
-            $extension = pathinfo($assetName, PATHINFO_EXTENSION);
-            if ($extension === 'css') {
+            try {
+                $assetName = $args['path'];
+                $assetContent = $pagePreviewerController->retrieveAsset($assetName);
+                $mimeType = $this->convertFileExtToMimeType($assetName);
                 $response->getBody()->write($assetContent);
-                return $response->withHeader('Content-Type', 'text/css')->withStatus(200);
-            } elseif ($extension === 'js') {
-                $response->getBody()->write($assetContent);
-                return $response->withHeader('Content-Type', 'application/javascript')->withStatus(200);
-            } else {
-                $response->getBody()->write('Asset not found');
+                return $response->withHeader('Content-Type', $mimeType)->withStatus(200);
+            } catch (\Exception $e) {
+                $response->getBody()->write('Asset not found: ' . $e->getMessage());
                 return $response->withHeader('Content-Type', 'text/plain')->withStatus(404);
             }
         });
         $this->applicationRunner->any('/{any:.*}', function (Request $request, Response $response, array $args) {
-            Container::get()->add(
-                TemplateServiceInterface::class,
-                new TemplateService(
-                    Container::get()->get(ConfigurationInterface::class),
-                    Container::get()->get(ThemeService::class),
-                    Container::get()->get(FileFactory::class),
-                )
-            );
-            Container::get()->add(
-                ExporterInterface::class,
-                new PagePreviewerExportService()
-            );
+            // Assign the TemplateService and ExporterService to the container
+            $this->assignTemplateService($this->getDefaultTemplateService());
+            $this->assignExporterService(new PagePreviewerExportService());
             try {
                 $anyPath = $args['any'];
                 if (empty($anyPath)) {
@@ -173,11 +129,58 @@ class HTTPRunner implements RunnerInterface
                 $html = $pagePreviewerController->renderHtml($pageJson);
                 $response->getBody()->write($html);
                 return $response->withHeader('Content-Type', 'text/html')->withStatus(200);
-            } catch (\Throwable $th) {
+            } catch (\Exception $e) {
                 //throw $th;
                 return $response->withHeader('Content-Type', 'text/plain')->withStatus(404);
             }
         });
+    }
+
+    private function assignTemplateService(TemplateServiceInterface $templateService)
+    {
+        Container::get()->add(TemplateServiceInterface::class, $templateService);
+    }
+
+    private function assignExporterService(ExporterInterface $exporterService)
+    {
+        Container::get()->add(ExporterInterface::class, $exporterService);
+    }
+
+    private function getDefaultTemplateService() {
+        return new TemplateService(
+            Container::get()->get(ConfigurationInterface::class),
+            Container::get()->get(ThemeService::class),
+            Container::get()->get(FileFactory::class),
+        );
+    }
+
+    /**
+     * Convert file extension to MIME type.
+     *
+     * @param string $assetName The name of the asset file.
+     * @return string The MIME type corresponding to the file extension.
+     */
+    private function convertFileExtToMimeType(string $assetName) {
+        $extension = pathinfo($assetName, PATHINFO_EXTENSION);
+        switch ($extension) {
+            case 'css':
+                return 'text/css';
+            case 'js':
+                return 'application/javascript';
+            case 'ico':
+                return 'image/x-icon';
+            case 'png':
+                return 'image/png';
+            case 'jpg':
+            case 'jpeg':
+                return 'image/jpeg';
+            case 'gif':
+                return 'image/gif';
+            case 'svg':
+                return 'image/svg+xml';
+            default:
+                return 'text/plain'; // Default fallback
+        }
     }
 
     /**

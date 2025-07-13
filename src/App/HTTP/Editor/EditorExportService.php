@@ -20,7 +20,7 @@ class EditorExportService implements ExporterInterface {
         } elseif (pathinfo($fileNameWithExtension, PATHINFO_EXTENSION) === 'js') {
             $exportPath = $exportPath . 'script.js';
         } else {
-            throw new \Exception("Unsupported file type: " . pathinfo($fileNameWithExtension, PATHINFO_EXTENSION));
+            $exportPath = $exportPath . $fileNameWithExtension;
         }
         file_put_contents($exportPath, $content);
     }

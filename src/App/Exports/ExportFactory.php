@@ -3,14 +3,17 @@
 namespace Kenjiefx\ScratchPHP\App\Exports;
 
 use Kenjiefx\ScratchPHP\App\Configurations\ConfigurationInterface;
+use Kenjiefx\ScratchPHP\App\Files\FileService;
 use Kenjiefx\ScratchPHP\App\Pages\PageModel;
 use Kenjiefx\ScratchPHP\App\Pages\PageService;
+use Kenjiefx\ScratchPHP\App\Statics\StaticAssetsModel;
 
 class ExportFactory {
 
     public function __construct(
         public readonly ConfigurationInterface $configuration,
-        public readonly PageService $pageService
+        public readonly PageService $pageService,
+        public readonly FileService $fileService
     ) {}
 
     public function createFromPage(
@@ -43,6 +46,15 @@ class ExportFactory {
         $relativePath = 'assets' 
             . ($dir !== '.' ? '/' . $dir : '') 
             . '/' . $fileName;
+        return new ExportModel($relativePath, $content);
+    }
+
+    public function createAsStaticAsset(
+        StaticAssetsModel $staticAssetModel,
+    ) {
+        $fileName = $staticAssetModel->fileName;
+        $relativePath = "assets/{$fileName}";
+        $content = $this->fileService->readFile($staticAssetModel->filePath);
         return new ExportModel($relativePath, $content);
     }
     

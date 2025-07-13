@@ -13,5 +13,6 @@ enum BuildMessage: string
     case GET_PAGE = 'page.get';
     case GET_COMPONENT_REGISTRY = 'component.registry.get';
     case GET_BLOCK_REGISTRY = 'block.registry.get';
+    case GET_STATIC_ASSETS_REGISTRY = 'static.assets.get';
 
 }
