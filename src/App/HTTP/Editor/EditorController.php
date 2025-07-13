@@ -50,7 +50,7 @@ class EditorController {
         } elseif (pathinfo($assetName, PATHINFO_EXTENSION) === 'js') {
             $assetPath .= 'script.js';
         } else {
-            throw new \Exception("Unsupported asset type: " . pathinfo($assetName, PATHINFO_EXTENSION));
+            $assetPath .= $assetName;
         }
         if (!file_exists($assetPath)) {
             throw new \Exception("Asset file not found: $assetPath");
