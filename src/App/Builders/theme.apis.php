@@ -163,7 +163,7 @@ function page_data(string $field){
         BuildMessage::GET_PAGE
     );
     $pageData = $pageModel->data;
-    return $pageData[$field] ?? null;
+    return $pageData->get($field);
 }
 
 function base_url(): string {

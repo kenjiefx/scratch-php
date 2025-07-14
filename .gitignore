@@ -11,3 +11,5 @@
 !/src/App/HTTP/Previewer/exports/README.md
 /src/App/HTTP/Editor/exports/*
 !/src/App/HTTP/Editor/exports/README.md
+/docs/node_modules/
+/docs/**/*.js

@@ -1,0 +1,21 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:docs": "tsc && node src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "devDependencies": {
+    "@types/node": "^20.17.5",
+    "typescript": "^4.9.4"
+  },
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "glob": "^11.0.3",
+    "markdown-it": "^14.1.0"
+  }
+}

@@ -1,27 +1,29 @@
 # Scratch PHP
+### Introduction
 ScratchPHP is a simple, lightweight, and endlessly extendable static site generator. Its goal is to provide developers with an easy and maintainable way to build static websites, leveraging the power and flexibility of PHP’s templating engine.
 
-#### No Parsers, No Hassle
+##### No Parsers, No Hassle
 ScratchPHP takes advantage of PHP itself being a templating engine—no custom templating DSL, no parsing libraries. This library relies on simple APIs which are PHP functions themselves, reducing dependencies and eliminating unnecessary overhead. 
 This approach keeps ScratchPHP lightweight while still providing the flexibility and power needed to build dynamic static content efficiently.
 
-## Getting Started
+### Getting Started
 The simplest way to get started with Scratch PHP is to create a project using Scratch Skeleton by running this command: 
 
-``` composer create-project kenjiefx/scratch-skeleton <app name> ```
+```bash
+composer create-project kenjiefx/scratch-skeleton <app name>
+```
 
 Everything you need to get started is included in the skeleton repository. It comes with a built-in development server, allowing you to preview your site instantly—no need to manually run the `build` command during development.
 
-```php -S 127.0.0.1:7743 server.php```
+```bash
+php -S 127.0.0.1:7743 server.php
+```
 
-Run the command above to start the development server.
+> ***Note:*** While the built-in server is powered by the Slim PHP framework—a robust, production-ready framework—it’s highly recommended to use a server that serves static files directly. Routing traffic through `server.php` in production defeats the purpose of ScratchPHP, which is to generate static sites.
 
-## Application Life Cycle
+### Application Life Cycle
 ScratchPHP begins with the instantiation of `Kenjiefx\ScratchPHP\App()`, which detects the runtime context—either CLI or HTTP—and instantiates the appropriate app runner interface. Depending on the context, the CLI runner handles terminal commands, while the HTTP runner manages web requests, both adhering to a common interface with environment-specific implementations. 
 
-Before reaching the service layer, extensions are registered once per execution cycle by the Extension Manager. Early in the lifecycle, service providers are delegated based on the specific CLI command or HTTP route. Finally, the Build Service orchestrates the build process and hands off the export of static pages and assets to an export provider.
+Before reaching the service layer, extensions are registered once per execution cycle by the Extension Manager. Early in the lifecycle, service providers are delegated based on the specific CLI command or HTTP route. 
 
-## Contributing
-Please see CONTRIBUTING.md.
-
-
+Finally, the Build Service orchestrates the build process and hands off the export of static pages and assets to an export provider.
