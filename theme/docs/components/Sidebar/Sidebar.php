@@ -3,12 +3,12 @@
   <p class="menu-label">Documentation</p>
   <ul class="menu-list">
     <li>
-      <a href="<?php echo $baseUrl; ?>" data-sidebar-activate="/">Introduction</a>
+      <a href="<?php echo $baseUrl; ?>index.html" data-sidebar-activate="/index.html" data-index-page="/">Introduction</a>
       <ul>
-        <li><a href="/#introduction">About Scratch PHP</a></li>
-        <li><a href="/#getting_started">Getting Started</a></li>
-        <li><a href="/#application_life_cycle">Application Life Cycle</a></li>
-        <li><a href="/#extensibility">Extensibility</a></li>
+        <li><a href="<?php echo $baseUrl; ?>index.html#introduction">About Scratch PHP</a></li>
+        <li><a href="<?php echo $baseUrl; ?>index.html#getting_started">Getting Started</a></li>
+        <li><a href="<?php echo $baseUrl; ?>index.html#application_life_cycle">Application Life Cycle</a></li>
+        <li><a href="<?php echo $baseUrl; ?>index.html#extensibility">Extensibility</a></li>
       </ul>
     </li>
   </ul>
