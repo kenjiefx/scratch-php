@@ -23,7 +23,7 @@ To build and export your static site, run the command below:
 php bin/scratch build
 ```
 
-To learn more about ScratchPHP, please see the [documentations page.](kenjiefx.github.io/scratch-php)
+To learn more about ScratchPHP, please see the [documentations page.](https://kenjiefx.github.io/scratch-php/)
 
 ## Application Life Cycle
 ScratchPHP begins with the instantiation of `Kenjiefx\ScratchPHP\App()`, which detects the runtime context—either CLI or HTTP—and instantiates the appropriate app runner interface. Depending on the context, the CLI runner handles terminal commands, while the HTTP runner manages web requests, both adhering to a common interface with environment-specific implementations. 
@@ -55,7 +55,7 @@ class MyExtension implements ExtensionsInterface {
 
 ## Documentation 
 
-To learn more about ScratchPHP, please see the [documentations page.](kenjiefx.github.io/scratch-php)
+To learn more about ScratchPHP, please see the [documentations page.](https://kenjiefx.github.io/scratch-php/)
 
 ## Contributing
 Please see CONTRIBUTING.md.

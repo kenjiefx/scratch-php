@@ -41,7 +41,7 @@ Please note that Scratch uses PHP’s Reflection API to verify that the extensio
 
 To listen to events, define a method within your `ExtensionClass` and annotate it with the `Kenjiefx\ScratchPHP\App\Events\ListensTo` attribute. Pass the event class reference as the argument to the attribute.
 
-You can find all available event classes at the following link:
+You can find all available event classes at the [Events documentation page.](http://127.0.0.1:7743/apis/events.html)
 
 ```php
 <?php 
