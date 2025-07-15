@@ -1,4 +1,17 @@
 # Theme API
+Theme files are located in the `<root>/theme` directory. Each theme is represented by a folder within this directory, and the folder name serves as the theme's identifier.
+
+Every theme includes an `index.php` file, which acts as the entry point during page rendering. This file wraps the entire HTML structure of the page.
+
+The default theme contains four subdirectories:
+- `snippets` – reusable pieces of code or content
+- `components` – self-contained UI elements
+- `blocks` – structured sections of a page
+- `assets` – static files such as CSS, JavaScript, and images
+
+Each folder holds resources relevant to its purpose, helping organize the theme for better maintainability and scalability.
+
+The following functions below helps you join pieces of theme files together.
 
 ### Template Content  
 Renders the main content of the page based on the associated Page JSON configuration. This function should be called where you want the page's body content to appear.

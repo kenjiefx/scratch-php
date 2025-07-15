@@ -15,12 +15,13 @@
     <li>
       <a href="apis/theme.html" data-sidebar-activate="/apis/theme.html">Theme API</a>
       <ul>
-        <li><a>Template Content</a></li>
-        <li><a>Template Assets</a></li>
-        <li><a>Page Title</a></li>
-        <li><a>Component</a></li>
-        <li><a>Block</a></li>
-        <li><a>Snippet</a></li>
+        <li><a href="../apis/theme.html#template_content">Template Content</a></li>
+        <li><a href="../apis/theme.html#template_assets">Template Assets</a></li>
+        <li><a href="../apis/theme.html#page_title">Page Title</a></li>
+        <li><a href="../apis/theme.html#component">Component</a></li>
+        <li><a href="../apis/theme.html#block">Block</a></li>
+        <li><a href="../apis/theme.html#snippet">Snippet</a></li>
+        <li><a href="../apis/theme.html#asset_links">Asset Links</a></li>
       </ul>
     </li>
     <li>
