@@ -1,0 +1,36 @@
+:root {
+    --bulma-primary-h: 314deg;
+    --bulma-primary-l: 49%;
+}
+.menu {
+    --bulma-menu-item-selected-h: var(--bulma-primary-h);
+    --bulma-menu-item-selected-s: var(--bulma-primary-s);
+    --bulma-menu-item-selected-l: var(--bulma-primary-l);
+}
+.menu-list a.is-active {
+    --bulma-menu-item-h: var(--bulma-menu-item-selected-h);
+    --bulma-menu-item-s: var(--bulma-menu-item-selected-s);
+    --bulma-menu-item-l: var(--bulma-menu-item-selected-l);
+    --bulma-menu-item-background-l: var(--bulma-menu-item-selected-background-l);
+    color: #000000 !important;
+}
+footer {
+    padding-bottom: 0.5rem !important;
+    padding-top: 0.5rem !important;
+}
+nav.navbar {
+    border-bottom: solid 1px #91ffcc;
+}
+@media (max-width: 768px) {
+    main {
+        padding-top: 0.8rem !important;
+    }
+}
+@media (min-width: 769px) {
+    .--sidebar-element {
+        position: sticky;
+        height: max-content;
+        top: 0px;
+    }
+}
+

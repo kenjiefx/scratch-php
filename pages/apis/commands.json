@@ -1,0 +1,8 @@
+{
+  "title": "ScratchPHP - Commands",
+  "template": "index",
+  "data": {
+    "content": "<h1>Commands</h1>\n<p>ScratchPHP includes a powerful command-line interface (CLI) that lets you build your static site and scaffold elements like components, blocks, and templates with ease.</p>\n<h3 id=\"build_command\">Build Command</h3>\n<p>You can build all the pages by running <code>php bin/scratch build</code>. This command accepts 2 options:</p>\n<ul>\n<li><code>--pageJson=index.json</code> To build just a specific page</li>\n<li><code>--baseUrl=</code> To add base URL to the config. By default, the base URL is <code>\\</code></li>\n</ul>\n<h3 id=\"create_theme\">Create Theme</h3>\n<p>To create a new theme, you can execute <code>php bin/scratch create:theme &lt;theme_name&gt;</code>.</p>\n<h3 id=\"create_template\">Create Template</h3>\n<p>To create a new template within the theme, you can execute <code>php bin/scratch create:template &lt;template_name&gt;</code>.</p>\n<h3 id=\"create_component\">Create Component</h3>\n<p>To create a new component, <code>php bin/scratch create:component &lt;component_name&gt;</code>.</p>\n<h3 id=\"create_block\">Create Block</h3>\n<p>To create a new block, <code>php bin/scratch create:block &lt;block_name&gt;</code>.</p>\n",
+    "updatedAt": 1752572547191
+  }
+}
