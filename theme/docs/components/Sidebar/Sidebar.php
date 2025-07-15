@@ -26,7 +26,7 @@
       </ul>
     </li>
     <li>
-      <a>Extensions</a>
+      <a href="../apis/extensions.html" data-sidebar-activate="/apis/extensions.html">Extensions</a>
       <ul>
         <li><a href="../apis/extensions.html#registration">Registration</a></li>
         <li><a href="../apis/extensions.html#settings_registry">Settings Registry</a></li>
@@ -35,7 +35,28 @@
       </ul>
     </li>
     <li>
-      <a>Events</a>
+      <a href="../apis/commands.html" data-sidebar-activate="/apis/commands.html">Commands</a>
+      <ul>
+        <li><a href="../apis/commands.html#build_command">Build Command</a></li>
+        <li><a href="../apis/commands.html#create_theme">Create Theme</a></li>
+        <li><a href="../apis/commands.html#create_template">Create Template</a></li>
+        <li><a href="../apis/commands.html#create_component">Create Component</a></li>
+        <li><a href="../apis/commands.html#create_block">Create Block</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="../apis/events.html" data-sidebar-activate="/apis/events.html">Events</a>
+      <ul>
+        <li><a href="../apis/events.html#pagebuildstartedevent">PageBuildStartedEvent</a></li>
+        <li><a href="../apis/events.html#htmlbuildcompletedevent">HTMLBuildCompletedEvent</a></li>
+        <li><a href="../apis/events.html#cssbuildcompletedevent">CSSBuildCompletedEvent</a></li>
+        <li><a href="../apis/events.html#jsbuildcompletedevent">JSBuildCompletedEvent</a></li>
+        <li><a href="../apis/events.html#componentcsscollectedevent">ComponetHTMLCollectedEvent</a></li>
+        <li><a href="../apis/events.html#htmlbuildcompletedevent">ComponentCSSCollectedEvent</a></li>
+        <li><a href="../apis/events.html#componentjscollectedevent">ComponentJSCollectedEvent</a></li>
+        <li><a href="../apis/events.html#blockcsscollectedevent">BlockCSSCollectedEvent</a></li>
+        <li><a href="../apis/events.html#blockjscollectedevent">BlockJSCollectedEvent</a></li>
+      </ul>
     </li>
   </ul>
 </aside>
