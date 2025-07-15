@@ -7,6 +7,7 @@
         <li><a href="/#introduction">About Scratch PHP</a></li>
         <li><a href="/#getting_started">Getting Started</a></li>
         <li><a href="/#application_life_cycle">Application Life Cycle</a></li>
+        <li><a href="/#extensibility">Extensibility</a></li>
       </ul>
     </li>
   </ul>

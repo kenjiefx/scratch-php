@@ -27,3 +27,28 @@ ScratchPHP begins with the instantiation of `Kenjiefx\ScratchPHP\App()`, which d
 Before reaching the service layer, extensions are registered once per execution cycle by the Extension Manager. Early in the lifecycle, service providers are delegated based on the specific CLI command or HTTP route. 
 
 Finally, the Build Service orchestrates the build process and hands off the export of static pages and assets to an export provider.
+
+### Extensibility 
+
+ScratchPHP provides a flexible way to extend the build process through Extensions. Extensions let you modify HTML, JavaScript, and CSS before they’re exported—ideal for tasks like minifying assets, injecting custom HTML, generating boilerplate code, and more.
+
+To learn more about Extensions, visit the following link: [Extensions](../apis/extensions.html)
+
+```php
+<?php 
+
+namespace App;
+
+use Kenjiefx\ScratchPHP\App\Events\ListensTo;
+use Kenjiefx\ScratchPHP\App\Events\PageBuildStartedEvent;
+use Kenjiefx\ScratchPHP\App\Extensions\ExtensionsInterface;
+
+class MyExtension implements ExtensionsInterface {
+
+    #[ListensTo(PageBuildStartedEvent::class)]
+    public function doSomethingWhenPageBuildStarts(PageBuildStartedEvent $event) {
+        // Please see all the fields you can retrieve from this event in the events docs
+    }
+
+}
+```
