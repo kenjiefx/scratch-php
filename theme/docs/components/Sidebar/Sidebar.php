@@ -13,7 +13,7 @@
   <p class="menu-label">API</p>
   <ul class="menu-list">
     <li>
-      <a href="apis/theme.html" data-sidebar-activate="/apis/theme.html">Theme API</a>
+      <a href="../apis/theme.html" data-sidebar-activate="/apis/theme.html">Theme API</a>
       <ul>
         <li><a href="../apis/theme.html#template_content">Template Content</a></li>
         <li><a href="../apis/theme.html#template_assets">Template Assets</a></li>
@@ -27,8 +27,10 @@
     <li>
       <a>Extensions</a>
       <ul>
-        <li><a>Declaration</a></li>
-        <li><a>Settings Registry</a></li>
+        <li><a href="../apis/extensions.html#registration">Registration</a></li>
+        <li><a href="../apis/extensions.html#settings_registry">Settings Registry</a></li>
+        <li><a href="../apis/extensions.html#extension_interface">Extension Interface</a></li>
+        <li><a href="../apis/extensions.html#listensto_attribute">ListensTo Attribute</a></li>
       </ul>
     </li>
     <li>
