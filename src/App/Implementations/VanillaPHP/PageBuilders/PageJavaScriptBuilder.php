@@ -14,11 +14,12 @@ class PageJavaScriptBuilder {
     public function __construct(
         private ThemeServiceInterface $themeService,
         private Filesystem $filesystem,
-        private EventBus $eventBus
+        private EventBus $eventBus,
+        private StaticAssetBundler $staticAssetBundler
     ) {}
 
     public function build(PageModel $pageModel) {
-        $js = "";
+        $js = $this->staticAssetBundler->bundleJsAssets($pageModel);
         $js .= $this->buildBlockJS($pageModel);
         $js .= $this->buildComponentJS($pageModel);
         return $js;
