@@ -11,3 +11,4 @@
 !/src/App/HTTP/Previewer/exports/README.md
 /src/App/HTTP/Editor/exports/*
 !/src/App/HTTP/Editor/exports/README.md
+.phpunit.result.cache
