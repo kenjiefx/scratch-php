@@ -5,7 +5,7 @@ namespace Tests\Unit\Implementations\VanillaPHP;
 use Kenjiefx\ScratchPHP\App\Assets\Static\StaticAssetRegistry;
 use Kenjiefx\ScratchPHP\App\Blocks\BlockRegistry;
 use Kenjiefx\ScratchPHP\App\Components\ComponentRegistry;
-use Kenjiefx\ScratchPHP\App\Implementations\Configuration\ScratchJSONConfiguration;
+use Kenjiefx\ScratchPHP\App\Implementations\ScratchJSON\ScratchJSONConfiguration;
 use Kenjiefx\ScratchPHP\App\Implementations\ThemeManager\ThemeService;
 use Kenjiefx\ScratchPHP\App\Implementations\VanillaPHP\OutputBuffer\OutputBufferService;
 use Kenjiefx\ScratchPHP\App\Implementations\VanillaPHP\PageBuilders\PageCSSBuilder;

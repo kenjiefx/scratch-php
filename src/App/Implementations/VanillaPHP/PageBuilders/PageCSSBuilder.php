@@ -27,10 +27,16 @@ class PageCSSBuilder {
 
     public function buildComponentCSS(PageModel $pageModel): string {
         $css = "";
+        $includedPaths = [];
         foreach ($pageModel->componentRegistry->getAll() as $component) {
             $componentCssPath = $this->themeService->getComponentCssPath(
                 $pageModel->theme, $component
             );
+            // Avoid including the same component CSS multiple times
+            if (in_array($componentCssPath, $includedPaths)) {
+                continue;
+            }
+            $includedPaths[] = $componentCssPath;
             $componentCss = "";
             if ($this->filesystem->exists($componentCssPath)) {
                 $componentCss = $this->filesystem->readFile($componentCssPath);
@@ -46,10 +52,16 @@ class PageCSSBuilder {
 
     public function buildBlockCSS(PageModel $pageModel): string {
         $css = "";
+        $includedPaths = [];
         foreach ($pageModel->blockRegistry->getAll() as $block) {
             $blockCssPath = $this->themeService->getBlockCssPath(
                 $pageModel->theme, $block
             );
+            // Avoid including the same block CSS multiple times
+            if (in_array($blockCssPath, $includedPaths)) {
+                continue;
+            }
+            $includedPaths[] = $blockCssPath;
             $blockCss = "";
             if ($this->filesystem->exists($blockCssPath)) {
                 $blockCss = $this->filesystem->readFile($blockCssPath);

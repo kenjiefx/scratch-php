@@ -2,6 +2,7 @@
 
 namespace Kenjiefx\ScratchPHP\App\Implementations\DistExporter;
 
+use Kenjiefx\ScratchPHP\App\Assets\Static\StaticAssetRegistry;
 use Kenjiefx\ScratchPHP\App\Interfaces\ExportServiceInterface;
 use Kenjiefx\ScratchPHP\App\Pages\PageContent;
 use Kenjiefx\ScratchPHP\App\Pages\PageModel;
@@ -14,6 +15,10 @@ class DistExportService implements ExportServiceInterface {
 
     public function exportPageContents(PageContent $pageContent, PageModel $pageModel): void {
 
+    }
+
+    public function exportStaticAssets(StaticAssetRegistry $staticAssetRegistry, PageModel $pageModel): void {
+        
     }
 
     public function createPageAssetPath(PageModel $pageModel, string $assetType): string {

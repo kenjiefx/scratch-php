@@ -1,9 +1,8 @@
 <?php 
 
-namespace Kenjiefx\ScratchPHP\App\Implementations\Configuration;
+namespace Kenjiefx\ScratchPHP\App\Implementations\ScratchJSON;
 
 use Kenjiefx\ScratchPHP\App\Interfaces\ConfigurationInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 class ScratchJSONConfiguration implements ConfigurationInterface {
 
@@ -13,34 +12,21 @@ class ScratchJSONConfiguration implements ConfigurationInterface {
     protected static string $baseUrl;
     protected static bool $toUseHashedFilenames = false;
     protected static string | null $pageToBuild = null;
-    protected static array $extensions = [];
 
     public function __construct(
-        private Filesystem $fileSytem
+        private ScratchJSONLoader $loader,
     ) {}
 
     public function loadConfig(): void {
         static::$rootDir = ROOT;
-
         // Loading the scratch.json configuration file
-        $configs = $this->loadConfigFromJson();
-
+        $configs = $this->loader->loadConfigFromJson();
         // Loading required fields
         $this->loadRequiredFields($configs);
-
         // Loading optional configurations
         $this->loadOptionalFields($configs);
-
         // Loading optional build configurations
         $this->loadBuildConfigs($configs);
-
-        if (isset($configs['extensions']) && is_array($configs['extensions'])) {
-            static::$extensions = $configs['extensions'];
-        }
-    }
-
-    private function getJsonPath() {
-        return ROOT . "/scratch.json";
     }
 
     public function loadRequiredFields(array $configs): void {
@@ -64,21 +50,6 @@ class ScratchJSONConfiguration implements ConfigurationInterface {
         $buildConfigs = $configs['build'] ?? [];
         static::$toUseHashedFilenames = $buildConfigs['useHashedFilenames'] ?? false;
         static::$pageToBuild = $buildConfigs['pageToBuild'] ?? null;
-    }
-
-    public function loadConfigFromJson() {
-        $scratchJsonPath = $this->getJsonPath();
-        if (!$this->fileSytem->exists($scratchJsonPath)) {
-            $message = "Missing scratch.json configuration file.";
-            throw new \Exception($message);
-        }
-        $jsonContent = $this->fileSytem->readFile($scratchJsonPath);
-        $configs = json_decode($jsonContent, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $message = "Error parsing scratch.json configuration file.";
-            throw new \Exception($message);
-        }
-        return $configs;
     }
 
     public function getRootDir(): string
@@ -113,11 +84,6 @@ class ScratchJSONConfiguration implements ConfigurationInterface {
     public function pageToBuild(): string | null
     {
         return static::$pageToBuild;
-    }
-
-    public function getExtensions(): array
-    {
-        return static::$extensions;
     }
 
     public function getBaseUrl(): string

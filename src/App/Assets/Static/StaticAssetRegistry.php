@@ -17,7 +17,8 @@ class StaticAssetRegistry {
     ) {}
 
     /**
-     * Registers a static asset model.
+     * Registers a static asset model. StaticAssetRegistry will 
+     * not register the asset if it already exists in the registry.
      * 
      * @param StaticAssetModel $assetModel The static asset model to register.
      */
@@ -26,6 +27,15 @@ class StaticAssetRegistry {
         if (!isset($this->assets[$fileName])) {
             $this->assets[$fileName] = $assetModel;
         }
+    }
+
+    /**
+     * Returns all registered static asset models as an iterator.
+     * @return StaticAssetIterator
+     */
+    public function getAll(): StaticAssetIterator {
+        $staticAssetModels = array_values($this->assets);
+        return new StaticAssetIterator($staticAssetModels);
     }
 
 }

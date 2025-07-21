@@ -2,46 +2,13 @@
 
 namespace Tests\Unit\Implementations\Configuration;
 
-use Kenjiefx\ScratchPHP\App\Implementations\Configuration\ScratchJSONConfiguration;
+use Kenjiefx\ScratchPHP\App\Implementations\ScratchJSON\ScratchJSONConfiguration;
+use Kenjiefx\ScratchPHP\App\Implementations\ScratchJSON\ScratchJSONLoader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ScratchJSONConfigurationTest extends TestCase {
 
-    /** @test */
-    public function itShouldThrowAnErrorWhenConfigJsonDoesNotExist() {
-
-        // Given we have a configuration object
-        $fileSystem = $this->createMock(Filesystem::class);
-        $fileSystem->method('exists')->willReturn(false);
-        $configuration = new ScratchJSONConfiguration(
-            $fileSystem
-        );
-
-        // It should throw an error when the scratch.json file does not exist
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Missing scratch.json configuration file.");
-        $configuration->loadConfigFromJson();
-
-    }
-
-    /** @test */
-    public function itShouldThrowAnErrorWhenConfigJsonIsNotParsable() {
-
-        // Given we have a configuration object
-        $fileSystem = $this->createMock(Filesystem::class);
-        $fileSystem->method('exists')->willReturn(true);
-        $fileSystem->method('readFile')->willReturn('{"theme": "default", "exportDir": "dist}'); // Invalid JSON
-
-        $configuration = new ScratchJSONConfiguration(
-            $fileSystem
-        );
-
-        // It should throw an error when the scratch.json file is not parsable
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Error parsing scratch.json configuration file.");
-        $configuration->loadConfigFromJson();
-    }
 
     /** @test */
     public function itShouldLoadRequiredFieldsSuccessfully() {
@@ -52,7 +19,7 @@ class ScratchJSONConfigurationTest extends TestCase {
         $fileSystem->method('readFile')->willReturn('{"theme": "default", "exportDir": "dist"}');
 
         $configuration = new ScratchJSONConfiguration(
-            $fileSystem
+            new ScratchJSONLoader($fileSystem)
         );
 
         // When we load the configuration
@@ -73,7 +40,7 @@ class ScratchJSONConfigurationTest extends TestCase {
         $fileSystem->method('readFile')->willReturn('{"theme": "default", "exportDir": "dist", "baseUrl": "/app"}');
 
         $configuration = new ScratchJSONConfiguration(
-            $fileSystem
+            new ScratchJSONLoader($fileSystem)
         );
 
         // When we load the optional fields
@@ -93,7 +60,7 @@ class ScratchJSONConfigurationTest extends TestCase {
         $fileSystem->method('readFile')->willReturn('{"theme": "default", "exportDir": "dist"}');
 
         $configuration = new ScratchJSONConfiguration(
-            $fileSystem
+            new ScratchJSONLoader($fileSystem)
         );
 
         // When we load the optional fields
@@ -113,7 +80,7 @@ class ScratchJSONConfigurationTest extends TestCase {
         $fileSystem->method('readFile')->willReturn('{"theme": "default", "exportDir": "dist", "build": {"useHashedFilenames": true, "pageToBuild": "index.json"}}');
 
         $configuration = new ScratchJSONConfiguration(
-            $fileSystem
+            new ScratchJSONLoader($fileSystem)
         );
 
         // When we load the build configurations

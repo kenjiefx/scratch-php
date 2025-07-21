@@ -27,10 +27,16 @@ class PageJavaScriptBuilder {
 
     public function buildComponentJS(PageModel $pageModel): string {
         $js = "";
+        $includedPaths = [];
         foreach ($pageModel->componentRegistry->getAll() as $component) {
             $componentJsPath = $this->themeService->getComponentJsPath(
                 $pageModel->theme, $component
             );
+            // Avoid including the same component JS multiple times
+            if (in_array($componentJsPath, $includedPaths)) {
+                continue;
+            }
+            $includedPaths[] = $componentJsPath;
             $componentJs = "";
             if ($this->filesystem->exists($componentJsPath)) {
                 $componentJs = $this->filesystem->readFile($componentJsPath);
@@ -46,10 +52,16 @@ class PageJavaScriptBuilder {
 
     public function buildBlockJS(PageModel $pageModel): string {
         $js = "";
+        $includedPaths = [];
         foreach ($pageModel->blockRegistry->getAll() as $block) {
             $blockJsPath = $this->themeService->getBlockJsPath(
                 $pageModel->theme, $block
             );
+            // Avoid including the same block JS multiple times
+            if (in_array($blockJsPath, $includedPaths)) {
+                continue;
+            }
+            $includedPaths[] = $blockJsPath;
             $blockJs = "";
             if ($this->filesystem->exists($blockJsPath)) {
                 $blockJs = $this->filesystem->readFile($blockJsPath);
