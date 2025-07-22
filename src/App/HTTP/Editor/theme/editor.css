@@ -1,11 +1,3 @@
-<?php use Kenjiefx\ScratchPHP\App\HTTP\Editor\EditorService; ?>
-<section class="--editor-mainframe">
-    <section class="--editor-component-wrapper">
-        <?php component(EditorService::getComponentModel()->namespace); ?>
-    </section>
-</section>
-
-<style>
 .--editor-mainframe {
     position: fixed;
     top: 0;
@@ -26,4 +18,3 @@
     box-shadow: 1px 3px 9px 0px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
 }
-</style>
