@@ -1,22 +1,33 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\Events;
+
 use Kenjiefx\ScratchPHP\App\Events\EventInterface;
 
 #[\Attribute]
 class ListensTo
 {
-    private EventInterface $Event;
+    /**
+     * The event this class listens to.
+     * This should be a fully qualified class name that implements EventInterface.
+     * @var string
+     */
+    private string $event;
 
-    public function __construct(string $EventInterfaceClass){
-        $ReflectionObject = new \ReflectionObject(new $EventInterfaceClass());
-        if (!$ReflectionObject->implementsInterface(EventInterface::class)) {
-            throw new \Exception("Event class must implement EventInterface: $EventInterfaceClass");
+    public function __construct(string $eventInterfaceClass) {
+        $reflectionClass = new \ReflectionClass($eventInterfaceClass);
+        if (!$reflectionClass->implementsInterface(EventInterface::class)) {
+            throw new \Exception("Event class must implement EventInterface: $eventInterfaceClass");
         }
-        $this->Event = $ReflectionObject->newInstance();
+        $this->event = $eventInterfaceClass;
     }
 
-    public function getEvent():EventInterface{
-        return $this->Event;
+    /**
+     * Get the event this class listens to.
+     *
+     * @return string The fully qualified class name of the event.
+     */
+    public function getEvent(): string {
+        return $this->event;
     }
 }

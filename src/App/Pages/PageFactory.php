@@ -1,66 +1,50 @@
-<?php 
+<?php
 
 namespace Kenjiefx\ScratchPHP\App\Pages;
 
-use Kenjiefx\ScratchPHP\App\Files\File;
+use Kenjiefx\ScratchPHP\App\Assets\Static\StaticAssetRegistry;
+use Kenjiefx\ScratchPHP\App\Blocks\BlockRegistry;
+use Kenjiefx\ScratchPHP\App\Components\ComponentRegistry;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateModel;
+use Kenjiefx\ScratchPHP\App\Themes\ThemeModel;
+use Kenjiefx\ScratchPHP\App\Utils\UniqueIdGenerator;
 
-/**
- * Creates an instance of PageModel from a JSON file.
- */
 class PageFactory {
 
-    private static int $pageIdIncrementor = 1;
-
     public function __construct(
-
+        private UniqueIdGenerator $uniqueIdGenerator
     ) {}
 
-
     public function create(
-        string $pageJsonPath
-    ){
-        // Check if the file exists
-        if (!file_exists($pageJsonPath)) {
-            throw new \Exception("Page JSON file does not exist: $pageJsonPath");
+        string $name,
+        string $title,
+        string $template,
+        string $theme,
+        string | null $urlPath = null,
+        array $data = [],
+    ): PageModel {
+        // If name starts with a slash, remove it
+        $name = ltrim($name, '/');
+        $urlPath ??= "/{$name}.html";
+        $pageData = new PageData();
+        foreach ($data as $key => $value) {
+            $pageData[$key] = $value;
         }
-        // Check if the file is readable
-        if (!is_readable($pageJsonPath)) {
-            throw new \Exception("Page JSON file is not readable: $pageJsonPath");
-        }
-        $configuration = 
-            json_decode(file_get_contents($pageJsonPath), TRUE);
-        // validate the JSON structure
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception(
-                "Invalid JSON in page file: $pageJsonPath. Error: " . json_last_error_msg()
-            );
-        }
-        if (!isset($configuration['template'])) {
-            throw new \Exception(
-                "Missing 'template' field in page JSON: $pageJsonPath"
-            );
-        }
-        if (!isset($configuration['title'])) {
-            throw new \Exception(
-                "Missing 'title' field in page JSON: $pageJsonPath"
-            );
-        }
-        if (!isset($configuration['data'])) {
-            $configuration['data'] = [];
-        }
+        $theme = new ThemeModel($theme);
+        $templateModel = new TemplateModel($template);
+        $pageId = $this->uniqueIdGenerator->generate();
         return new PageModel(
-            id: strval(self::$pageIdIncrementor++).uniqid(),
-            name: basename($pageJsonPath, '.json'),
-            templateModel: new TemplateModel($configuration['template']),
-            file: new File(
-                $pageJsonPath
-            ),
-            title: $configuration['title'],
-            data: new PageData($configuration['data'])
+            id: $pageId,
+            name: $name,
+            title: $title,
+            urlPath: $urlPath,
+            theme: $theme,
+            template: $templateModel,
+            data: $pageData,
+            componentRegistry: new ComponentRegistry(),
+            blockRegistry: new BlockRegistry(),
+            staticAssetRegistry: new StaticAssetRegistry()
         );
     }
-
-    
 
 }

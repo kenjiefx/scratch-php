@@ -2,7 +2,7 @@
     "theme": "docs",
     "exportDir": "\/dist",
     "build": {
-        "useHashedFilenames": false
+        "useHashedFilenames": true
     },
     "create":{},
     "extensions": {}

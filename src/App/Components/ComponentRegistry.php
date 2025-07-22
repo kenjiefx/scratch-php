@@ -1,32 +1,37 @@
-<?php
+<?php 
 
 namespace Kenjiefx\ScratchPHP\App\Components;
 
 /**
- * Registers and manages the components used within the template.
- * This object holds an array of
+ * A registry of components.
  */
 class ComponentRegistry {
 
     /**
-     * An array of Component Models
+     * @var ComponentModel[]
      */
-    private static array $registry = [];
+    private array $components = [];
 
     public function __construct(
 
     ) {}
 
-    public function register(ComponentModel $componentModel){
-        array_push(self::$registry, $componentModel);
+    /**
+     * Registers a component in the registry.
+     *
+     * @param ComponentModel $component The component to register.
+     */
+    public function register(ComponentModel $component): void {
+        $this->components[] = $component;
     }
 
-    public function get(): ComponentsIterator {
-        return new ComponentsIterator(self::$registry);
-    }
-
-    public function clear(){
-        self::$registry = [];
+    /**
+     * Returns an iterator for all registered components.
+     *
+     * @return ComponentIterator
+     */
+    public function getAll(): ComponentIterator {
+        return new ComponentIterator($this->components);
     }
 
 }

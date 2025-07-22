@@ -1,35 +1,24 @@
-<?php
+<?php 
 
 namespace Kenjiefx\ScratchPHP\App\Blocks;
 
-use Kenjiefx\ScratchPHP\App\Blocks\BlockModel;
-use Kenjiefx\ScratchPHP\App\Blocks\BlocksIterator;
-
-/**
- * Registers and manages the blocks used within the template.
- * This object holds an array of
- */
 class BlockRegistry {
 
     /**
-     * An array of Block Models
+     * @var BlockModel[]
      */
-    private static array $registry = [];
+    private array $blocks = [];
 
     public function __construct(
 
     ) {}
 
-    public function register(BlockModel $blockModel){
-        array_push(self::$registry, $blockModel);
+    public function register(BlockModel $component): void {
+        $this->blocks[] = $component;
     }
 
-    public function get(): BlocksIterator {
-        return new BlocksIterator(self::$registry);
-    }
-
-    public function clear(){
-        self::$registry = [];
+    public function getAll(): BlockIterator {
+        return new BlockIterator($this->blocks);
     }
 
 }

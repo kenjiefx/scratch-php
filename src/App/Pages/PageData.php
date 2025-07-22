@@ -2,18 +2,28 @@
 
 namespace Kenjiefx\ScratchPHP\App\Pages;
 
-class PageData {
-    
-    public function __construct(
-        public readonly array $data
-    ) {}
+class PageData implements \ArrayAccess {
 
-    /**
-     * Returns the value for a given key, or null if the key does not exist.
-     * Can only be set during construction.
-     */
-    public function get(string $key): mixed {
-        return $this->data[$key] ?? null;
+    private array $data = [];
+
+    public function offsetExists($offset): bool {
+        return isset($this->data[$offset]);
+    }
+
+    public function offsetGet($offset): mixed {
+        return $this->data[$offset] ?? null;
+    }
+
+    public function offsetSet($offset, $value): void {
+        if ($offset === null) {
+            $this->data[] = $value;
+        } else {
+            $this->data[$offset] = $value;
+        }
+    }
+
+    public function offsetUnset($offset): void {
+        unset($this->container[$offset]);
     }
 
 }

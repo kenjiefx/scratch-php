@@ -4,7 +4,7 @@
  * ScratchPHP Preview Server
  *
  * Start this server with:
- *   php -S 127.0.0.1:7743 server.php
+ *   php -S 127.0.0.1:7743 app.php
  *
  * ⚠️ This server is intended for development only.
  *

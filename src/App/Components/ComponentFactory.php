@@ -2,9 +2,13 @@
 
 namespace Kenjiefx\ScratchPHP\App\Components;
 
+use Kenjiefx\ScratchPHP\App\Utils\UniqueIdGenerator;
+
 class ComponentFactory {
 
-    private static int $idIncrementor = 1;
+    public function __construct(
+        private UniqueIdGenerator $uniqueIdGenerator
+    ) {}
 
     /**
      * Creates a new ComponentModel instance.
@@ -12,11 +16,17 @@ class ComponentFactory {
      * @param string $name The name of the component.
      * @return ComponentModel The created ComponentModel instance.
      */
-    public static function create(string $name): ComponentModel {
-        $componentId = strval(self::$idIncrementor++).uniqid();
-        return new ComponentModel(
-            $name,
-            $componentId
+    public function create(string $name, array $data): ComponentModel {
+        $uniqueId = $this->uniqueIdGenerator->generate();
+        $componentData = new ComponentData();
+        foreach ($data as $key => $value) {
+            $componentData[$key] = $value;
+        }
+        return new ComponentModel (
+            id: $uniqueId,
+            name: $name,
+            data: $componentData
         );
     }
+
 }

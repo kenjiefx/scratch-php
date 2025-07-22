@@ -1,10 +1,7 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\CLI;
-use Kenjiefx\ScratchPHP\App\Configurations\ConfigurationInterface;
-use Kenjiefx\ScratchPHP\App\Templates\TemplateGenerator;
-use Kenjiefx\ScratchPHP\App\Themes\ThemeModel;
-use Kenjiefx\ScratchPHP\Container;
+use Kenjiefx\ScratchPHP\App\Generators\TemplateGenerator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,19 +13,19 @@ class CreateTemplateCommand extends Command
 {
     protected static $defaultDescription = 'Creates a template in your theme';
 
+    public function __construct(
+        private TemplateGenerator $templateGenerator
+    ) {
+        parent::__construct();
+    }
+
     protected function execute(
         InputInterface $input, 
         OutputInterface $output
         ): int
     {
-        $configuration = Container::get()->get(ConfigurationInterface::class);
-        $themeName = $configuration->getThemeName();
-        $themeModel = new ThemeModel($themeName);
         $templateName = $input->getArgument('template_name');
-        $templateGenerator = Container::get()->get(TemplateGenerator::class);
-        $templateGenerator->generate(
-            $templateName, $themeModel
-        );
+        $this->templateGenerator->generate($templateName);
         return Command::SUCCESS;
     }
 

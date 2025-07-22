@@ -2,9 +2,9 @@
 
 namespace Kenjiefx\ScratchPHP;
 
-use Kenjiefx\ScratchPHP\App\Runner\HTTPRunner;
-use Kenjiefx\ScratchPHP\App\Runner\CLIRunner;
-use Kenjiefx\ScratchPHP\App\Runner\RunnerInterface;
+use Kenjiefx\ScratchPHP\App\Runners\HTTPRunner;
+use Kenjiefx\ScratchPHP\App\Runners\CLIRunner;
+use Kenjiefx\ScratchPHP\App\Runners\RunnerInterface;
 
 class App
 {
@@ -28,9 +28,5 @@ class App
     {
         $this->runner->loadDependencies();
         $this->runner->executeContext();
-    }
-
-    public static function container(){
-        
     }
 }
