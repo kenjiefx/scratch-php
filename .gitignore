@@ -7,9 +7,8 @@
 /src/App/Pages/bin/*
 !/src/App/Pages/bin/README.md
 /scratch.config.json
-/src/App/HTTP/Previewer/exports/*
-!/src/App/HTTP/Previewer/exports/README.md
+/src/App/HTTP/Exporter/exports/*
+!/src/App/HTTP/Exporter/exports/README.md
 /src/App/HTTP/Editor/exports/*
 !/src/App/HTTP/Editor/exports/README.md
-/docs/node_modules/
-/docs/**/*.js
+.phpunit.result.cache
