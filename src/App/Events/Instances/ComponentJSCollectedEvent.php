@@ -9,7 +9,7 @@ use Kenjiefx\ScratchPHP\App\Pages\PageModel;
 /**
  * This event is triggered when JavaScript for a component is collected.
  */
-class ComponentJsCollectedEvent implements EventInterface {
+class ComponentJSCollectedEvent implements EventInterface {
 
     public function __construct(
         /**

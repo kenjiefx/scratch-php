@@ -4,7 +4,7 @@ namespace Kenjiefx\ScratchPHP\App\Implementations\VanillaPHP\PageBuilders;
 
 use Kenjiefx\ScratchPHP\App\Events\EventBus;
 use Kenjiefx\ScratchPHP\App\Events\Instances\BlockJSCollectedEvent;
-use Kenjiefx\ScratchPHP\App\Events\Instances\ComponentJsCollectedEvent;
+use Kenjiefx\ScratchPHP\App\Events\Instances\ComponentJSCollectedEvent;
 use Kenjiefx\ScratchPHP\App\Interfaces\ThemeServiceInterface;
 use Kenjiefx\ScratchPHP\App\Pages\PageModel;
 use Symfony\Component\Filesystem\Filesystem;
@@ -41,7 +41,7 @@ class PageJavaScriptBuilder {
             if ($this->filesystem->exists($componentJsPath)) {
                 $componentJs = $this->filesystem->readFile($componentJsPath);
             }
-            $event = new ComponentJsCollectedEvent(
+            $event = new ComponentJSCollectedEvent(
                 $pageModel, $component, $componentJs
             );
             $this->eventBus->dispatchEvent($event);

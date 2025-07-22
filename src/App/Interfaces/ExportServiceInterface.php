@@ -3,7 +3,6 @@
 namespace Kenjiefx\ScratchPHP\App\Interfaces;
 
 use Kenjiefx\ScratchPHP\App\Assets\Static\StaticAssetRegistry;
-use Kenjiefx\ScratchPHP\App\Build\BuildOutputModel;
 use Kenjiefx\ScratchPHP\App\Pages\PageContent;
 use Kenjiefx\ScratchPHP\App\Pages\PageModel;
 

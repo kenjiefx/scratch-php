@@ -2,7 +2,6 @@
 
 namespace Kenjiefx\ScratchPHP\App\Implementations\VanillaPHP\OutputBuffer;
 
-use Kenjiefx\ScratchPHP\App\Assets\Static\StaticAssetsRegistry;
 use Kenjiefx\ScratchPHP\App\Pages\PageModel;
 
 /**
