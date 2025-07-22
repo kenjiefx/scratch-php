@@ -39,6 +39,7 @@ class VanillaPHPBuilderTest extends TestCase {
         });
         $builder = $container->get(VanillaPHPBuilder::class);
         $pageModel = new PageModel(
+            id: '1',
             name: 'index',
             title: 'Home Page',
             urlPath: '/',
@@ -74,6 +75,7 @@ class VanillaPHPBuilderTest extends TestCase {
         });
         $builder = $container->get(VanillaPHPBuilder::class);
         $pageModel = new PageModel(
+            id: '2',
             name: 'index',
             title: 'Home Page',
             urlPath: '/',
@@ -117,6 +119,7 @@ class VanillaPHPBuilderTest extends TestCase {
         ));
         $builder = $container->get(VanillaPHPBuilder::class);
         $pageModel = new PageModel(
+            id: '3',
             name: 'index',
             title: 'Home Page',
             urlPath: '/',

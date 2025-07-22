@@ -7,11 +7,12 @@ use Kenjiefx\ScratchPHP\App\Blocks\BlockRegistry;
 use Kenjiefx\ScratchPHP\App\Components\ComponentRegistry;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateModel;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeModel;
+use Kenjiefx\ScratchPHP\App\Utils\UniqueIdGenerator;
 
 class PageFactory {
 
     public function __construct(
-
+        private UniqueIdGenerator $uniqueIdGenerator
     ) {}
 
     public function create(
@@ -31,7 +32,9 @@ class PageFactory {
         }
         $theme = new ThemeModel($theme);
         $templateModel = new TemplateModel($template);
+        $pageId = $this->uniqueIdGenerator->generate();
         return new PageModel(
+            id: $pageId,
             name: $name,
             title: $title,
             urlPath: $urlPath,

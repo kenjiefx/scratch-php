@@ -20,6 +20,7 @@ class DistExportServiceTest extends TestCase {
         // Given we have a DistExportService instance and a PageModel
         $exportService = new DistExportService();
         $pageModel = new PageModel(
+            id: '12345',
             name: 'test-page',
             title: 'Test Page',
             urlPath: '/blogs/test-page.html',

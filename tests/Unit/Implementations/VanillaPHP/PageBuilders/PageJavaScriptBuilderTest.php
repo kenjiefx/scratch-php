@@ -42,6 +42,7 @@ class PageJavaScriptBuilderTest extends TestCase {
             data: new BlockData()
         ));
         $pageModel = new PageModel(
+            id: '1',
             name: 'index',
             title: 'Home Page',
             urlPath: '/',
@@ -101,6 +102,7 @@ class PageJavaScriptBuilderTest extends TestCase {
             data: new ComponentData()
         ));
         $pageModel = new PageModel(
+            id: '1',
             name: 'index',
             title: 'Home Page',
             urlPath: '/',

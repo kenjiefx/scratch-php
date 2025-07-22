@@ -12,16 +12,20 @@ use Kenjiefx\ScratchPHP\App\Pages\PageIterator;
 use Kenjiefx\ScratchPHP\App\Pages\PageModel;
 use Kenjiefx\ScratchPHP\App\Templates\TemplateModel;
 use Kenjiefx\ScratchPHP\App\Themes\ThemeModel;
+use Kenjiefx\ScratchPHP\App\Utils\UniqueIdGenerator;
 
 class EditorPageCollectorService implements PageCollectorInterface {
 
     public function __construct(
-        private ConfigurationInterface $configuration
+        private ConfigurationInterface $configuration,
+        private UniqueIdGenerator $idGenerator
     ) {}
 
     public function collectAll(): PageIterator {
         $themeName = $this->configuration->getThemeName();
+        $pageId = $this->idGenerator->generate();
         $pageModel = new PageModel(
+            id: $pageId,
             name: 'editor',
             title: 'ScratchPHP Theme Editor',
             urlPath: '/editor',

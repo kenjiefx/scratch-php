@@ -16,6 +16,11 @@ class PageModel {
     public function __construct(
 
         /**
+         * The unique identifier for the page.
+         */
+        public readonly string $id,
+
+        /**
          * The name of the page. 
          * This is typically the filename without the extension.
          */
