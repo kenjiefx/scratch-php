@@ -1,6 +1,6 @@
 <?php 
 
-namespace Kenjiefx\ScratchPHP\App\Directories;
+namespace Kenjiefx\ScratchPHP\App\Utils;
 
 class DirectoryService {
 
