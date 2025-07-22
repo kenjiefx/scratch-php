@@ -2,6 +2,7 @@
 
 namespace Kenjiefx\ScratchPHP\App\Extensions;
 
-interface ExtensionsInterface {
+
+interface ExtensionInterface {
     
 }
