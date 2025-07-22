@@ -5,7 +5,7 @@
       The website is proudly built with <strong>ScratchPHP</strong>. 
       This page is updated since <?php 
         $timestamp = page_data('updatedAt');
-        echo date('F j, Y g:i A', $timestamp/1000);
+        echo date('F j, Y g:i A', (int) ($timestamp / 1000));
         ?>.
     </p>
   </div>
