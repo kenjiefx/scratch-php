@@ -1,11 +1,7 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\CLI;
-use Kenjiefx\ScratchPHP\App\Components\ComponentGenerator;
-use Kenjiefx\ScratchPHP\App\Components\ComponentService;
-use Kenjiefx\ScratchPHP\App\Configurations\ConfigurationInterface;
-use Kenjiefx\ScratchPHP\App\Themes\ThemeModel;
-use Kenjiefx\ScratchPHP\Container;
+use Kenjiefx\ScratchPHP\App\Generators\ComponentGenerator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -18,19 +14,19 @@ class CreateComponentCommand extends Command
 {
     protected static $defaultDescription = 'Creates a component in your theme';
 
+    public function __construct(
+        private ComponentGenerator $componentGenerator,
+    ) {
+        parent::__construct();
+    }
+
     protected function execute(
         InputInterface $input, 
         OutputInterface $output
         ): int
     {
-        $configuration = Container::get()->get(ConfigurationInterface::class);
-        $themeName = $configuration->getThemeName();
-        $themeModel = new ThemeModel($themeName);
         $componentName = $input->getArgument('component_name');
-        $componentGenerator = Container::get()->get(ComponentGenerator::class);
-        $componentGenerator->generate(
-            $componentName, $themeModel
-        );
+        $this->componentGenerator->generate($componentName);
         return Command::SUCCESS;
     }
 

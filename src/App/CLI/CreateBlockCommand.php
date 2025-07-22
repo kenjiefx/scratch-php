@@ -1,10 +1,7 @@
 <?php
 
 namespace Kenjiefx\ScratchPHP\App\CLI;
-use Kenjiefx\ScratchPHP\App\Blocks\BlockGenerator;
-use Kenjiefx\ScratchPHP\App\Configurations\ConfigurationInterface;
-use Kenjiefx\ScratchPHP\App\Themes\ThemeModel;
-use Kenjiefx\ScratchPHP\Container;
+use Kenjiefx\ScratchPHP\App\Generators\BlockGenerator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,19 +14,19 @@ class CreateBlockCommand extends Command
 {
     protected static $defaultDescription = 'Creates a block in your theme';
 
+    public function __construct(
+        private BlockGenerator $blockGenerator
+    ) {
+        parent::__construct();
+    }
+
     protected function execute(
         InputInterface $input, 
         OutputInterface $output
         ): int
     {
-        $configuration = Container::get()->get(ConfigurationInterface::class);
-        $themeName = $configuration->getThemeName();
-        $themeModel = new ThemeModel($themeName);
         $blockName = $input->getArgument('block_name');
-        $blockGenerator = Container::get()->get(BlockGenerator::class);
-        $blockGenerator->generate(
-            $blockName, $themeModel
-        );
+        $this->blockGenerator->generate($blockName);
         return Command::SUCCESS;
     }
 
