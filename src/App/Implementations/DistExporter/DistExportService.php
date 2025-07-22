@@ -88,7 +88,11 @@ class DistExportService implements ExportServiceInterface {
 
     public function exportStaticAssets(StaticAssetRegistry $registry, PageModel $pageModel): void {
         $assetsDir = $this->themeService->getAssetsDir($pageModel->theme);
-        $assetsExportDir = $this->configuration->getExportDir() . '/assets';
+        $distDir = $this->joinPath(
+            $this->configuration->getRootDir(),
+            $this->configuration->getExportDir()
+        );
+        $assetsExportDir = $this->joinPath($distDir, 'assets');
         foreach ($registry->getAll() as $staticAssetModel) {
             $fileName = $staticAssetModel->fileName;
             $assetFilePath = "{$assetsDir}/{$fileName}";
